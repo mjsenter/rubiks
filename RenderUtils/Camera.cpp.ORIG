@@ -1,0 +1,360 @@
+#include "Camera.h"
+#include "Util.h"
+
+#define WORLD_UP Y
+//#define WORLD_UP Z
+
+#if WORLD_UP == Y
+  const vec3 worldUp(0.0f, 1.0f, 0.0f);
+  #define RotateUp(theta) RotateY(theta)
+#elif WORLD_UP == Z
+  const vec3 worldUp(0.0f, 0.0f, 1.0f);
+  #define RotateUp(theta) RotateZ(theta)
+#else
+  #error Bad world up vector
+#endif
+
+/*
+ * Main constructor
+ */
+Camera::Camera(
+    const vec3& position,
+    const vec3& forward,
+    const vec3& up,
+    float aspectRatio,
+    float fovY,
+    float nearPlane,
+    float farPlane)
+    : position(position),
+    forward(normalize(forward)),
+    aspectRatio(aspectRatio),
+    fovY(fovY),
+    nearPlane(nearPlane),
+    farPlane(farPlane),
+    viewStale(false),
+    projStale(false)
+{
+    // Ensure the basis vectors are orthogonal and normalized
+    this->right = normalize(cross(forward, up));
+    this->up    = normalize(cross(right, forward));
+
+    RecalculateView();
+    RecalculateProjection();
+}
+
+/*
+ * Copy constructor
+ */
+Camera::Camera(const Camera& other)
+    : position(  other.position),
+    forward(     other.forward),
+    right(       other.right),
+    up(          other.up),
+    aspectRatio( other.aspectRatio),
+    fovY(        other.fovY),
+    nearPlane(   other.nearPlane),
+    farPlane(    other.farPlane),
+    view(        other.view),
+    projection(  other.projection),
+    viewStale(   other.viewStale),
+    projStale(   other.projStale)
+{
+    // Nothing more to do
+}
+
+/*
+ * Destructor
+ */
+Camera::~Camera()
+{
+    // Do nothing
+}
+
+/*
+ * Assignment operator
+ */
+Camera& Camera::operator=(const Camera& other)
+{
+    // Copy everything
+    this->aspectRatio = other.aspectRatio;
+    this->farPlane    = other.farPlane;
+    this->forward     = other.forward;
+    this->fovY        = other.fovY;
+    this->nearPlane   = other.nearPlane;
+    this->position    = other.position;
+    this->projection  = other.projection;
+    this->projStale   = other.projStale;
+    this->right       = other.right;
+    this->up          = other.up;
+    this->view        = other.view;
+    this->viewStale   = other.viewStale;
+
+    return *this;
+}
+
+/*
+ * Look at position
+ */
+void Camera::LookAt(const vec3& position)
+{
+    vec3 forwardTemp = position - this->position;
+    
+    if (LengthSquared(forwardTemp) < 0.0001f)
+    {
+        // The position we are trying to look at is roughly equal to our
+        // current position, we can't look at it.  Keep our view unchanged
+        return;
+    }
+
+    // Re-derive our basis vectors using the world up
+    forward = normalize(forwardTemp);
+    vec3 rightTemp = cross(forward, worldUp);
+
+    // If the new forward direction is parallel to the world up,
+    // the cross product will be a zero vector, which makes finding
+    // a good up vector a little more complicated
+    if (LengthSquared(rightTemp) < 0.0001f)
+    {
+        // Our new forward is parallel to the world up.
+        // Unless we have been using the pitch/yaw/roll functions,
+        // our right vector will always be perpendicular to the world up.
+        // Handle this case by re-using the old right vector
+        vec3 upTemp = cross(right, forward);
+
+        // This works so long as the old right vector is not parallel to
+        // the world up vector.  If it was, then re-use the old up vector
+        // which then cannot be parallel to the world up vector
+        if (LengthSquared(upTemp) < 0.0001f)
+        {
+            right = normalize(cross(forward, up));
+            up    = normalize(cross(right, forward));
+        }
+        else
+        {
+            // The above calculation always returns the up vector above the
+            // xz plane (y-up) or xy plane (z-up).  If we are just crossing the
+            // vertical, we want the up vector to be able to go under the plane
+            // to prevent sudden jumps.
+            // We can accomplish this by checking the sign of the dot product
+            // between the old up vector and the newly calculated up vector.
+            // If the angle between them is greater than 90, the dot product
+            // will be negative.  In this case, we want the negation of the
+            // calculated up vector to prevent the 90+ degree jump.
+            up    = normalize(upTemp) * (dot(up, upTemp) > 0.0f ? 1.0f : -1.0f);
+            right = normalize(cross(forward, up));
+        }
+    }
+    else
+    {
+        // Typical case.
+        // If we just crossed the vertical, the right vector will flip.
+        // We can prevent this using the dot product, as described above
+        right = normalize(rightTemp) * (dot(right, rightTemp) > 0.0f ? 1.0f : -1.0f);
+        up    = normalize(cross(right, forward));
+    }
+
+    // Our view matrix is now out of date if it wasn't already
+    viewStale = true;
+}
+
+/*
+ * Look at position with up
+ */
+void Camera::LookAt(const vec3& position, const vec3& up)
+{
+    vec3 forwardTemp = position - this->position;
+
+    // Take the new forward vector if we can, otherwise keep the old one
+    if (LengthSquared(forwardTemp) >= 0.0001f)
+    {
+        forward = normalize(forwardTemp);
+    }
+
+    vec3 rightTemp = cross(forward, up);
+
+    // If the given up vector is parallel to the forward vector,
+    // the calculated right will be the zero vector.  In this case,
+    // we cannot just use the given up as is
+    if (LengthSquared(rightTemp) < 0.0001f)
+    {
+        // As in the above overload, try reusing the old right
+        vec3 upTemp = cross(right, forward);
+
+        // If our old right is parallel to our new forward, this will fail,
+        // but we can instead reuse the old up
+        if (LengthSquared(upTemp) < 0.0001f)
+        {
+            right    = normalize(cross(this->up, forward));
+            this->up = normalize(cross(right, forward));
+        }
+        else
+        {
+            this->up = normalize(upTemp);
+            right    = normalize(cross(forward, this->up));
+        }
+    }
+    else
+    {
+        // Typical case
+        right    = normalize(rightTemp);
+        this->up = normalize(cross(right, forward));
+    }
+
+    // The current view matrix is now outdated
+    viewStale = true;
+}
+
+/*
+ * Look up
+ */
+void Camera::LookUp(float degrees)
+{
+    // Look up by rotating around the right vector, which is assumed to be
+    // orthogonal to the world up vector
+    forward = TransformNormal(Rotate(right, degrees), forward);
+    up      = normalize(cross(right, forward));
+
+    // Minimize the impact of floating point rounding error by updating right
+    right   = normalize(cross(forward, up));
+
+    // Our view matrix needs updating
+    viewStale = true;
+}
+
+/*
+ * Look right
+ */
+void Camera::LookRight(float degrees)
+{
+    // Look right by rotating around the world up vector
+    mat4 rotate = RotateUp(-degrees);
+    forward     = TransformNormal(rotate, forward);
+    up          = TransformNormal(rotate, up);
+    right       = normalize(cross(forward, up));
+
+    // Minimize floating point rounding error by recalculating up to ensure
+    // all the basis vectors are orthogonal
+    up            = normalize(cross(right, forward));
+
+    // Our view matrix needs updating
+    viewStale     = true;
+}
+
+/*
+ * Pitch up
+ */
+void Camera::PitchUp(float degrees)
+{
+    // Pitch up by rotating around the right vector
+    forward = TransformNormal(Rotate(right, degrees), forward);
+    up      = normalize(cross(right, forward));
+
+    // Minimize floating point rounding error by recalculating right
+    right   = normalize(cross(forward, up));
+
+    // Our view matrix needs updating
+    viewStale = true;
+}
+
+/*
+ * Yaw right
+ */
+void Camera::YawRight(float degrees)
+{
+    // Yaw right by rotating around our current up vector
+    forward = TransformNormal(Rotate(up, -degrees), forward);
+    right   = normalize(cross(forward, up));
+
+    // Minimize floating point rounding error by recalculating up
+    up      = normalize(cross(right, forward));
+
+    // Our view matrix needs updating
+    viewStale = true;
+}
+
+/*
+ * Roll counter-clockwise
+ */
+void Camera::RollCCW(float degrees)
+{
+    // Roll by rotating around our current forward vector
+    right = TransformNormal(Rotate(forward, degrees), right);
+    up    = normalize(cross(right, forward));
+
+    // Minimize floating point rounding error by recalculating forward
+    forward = normalize(cross(up, right));
+
+    // Our view matrix needs updating
+    viewStale = true;
+}
+
+/*
+ * Orbit up
+ */
+void Camera::OrbitUp(float degrees)
+{
+    // Ensure we are looking at the origin when we start
+    LookAt(vec3(0.0f, 0.0f, 0.0f));
+
+    // Orbit up by rotating our position around the right vector
+    // while looking at the origin
+    position = Transform(Rotate(right, -degrees), position);
+    LookAt(vec3(0.0f, 0.0f, 0.0f));
+}
+
+/*
+ * Orbit up around point
+ */
+void Camera::OrbitUp(const vec3& origin, float degrees)
+{
+    // Same as before, but translate to the origin before rotating,
+    // then translate back when we are done
+    position -= origin;
+    OrbitUp(degrees);
+    position += origin;
+}
+
+/*
+ * Orbit right
+ */
+void Camera::OrbitRight(float degrees)
+{
+    // Ensure we are looking at the origin when we start
+    LookAt(vec3(0.0f, 0.0f, 0.0f));
+
+    // Orbit right by rotating our position around the world up vector
+    // while looking at the origin.
+    // Also rotate the up vector manually, which allows for rotation to
+    // continue when we hit the vertical
+    mat4 rotate = RotateUp(degrees);
+    position = Transform(rotate, position);
+    LookAt(vec3(0.0f, 0.0f, 0.0f), TransformNormal(rotate, up));
+}
+
+/*
+ * Orbit right around point
+ */
+void Camera::OrbitRight(const vec3& origin, float degrees)
+{
+    // Same as before, but translate to the origin before rotating,
+    // then translate back when we are done
+    position -= origin;
+    OrbitRight(degrees);
+    position += origin;
+}
+
+/*
+ * Recalculate view
+ */
+void Camera::RecalculateView() const
+{
+    view = Angel::LookAt(vec4(position, 1.0f), vec4(position + forward, 1.0f), vec4(up, 0.0f));
+}
+
+/*
+ * Recalculate projection
+ */
+void Camera::RecalculateProjection() const
+{
+    projection = Perspective(fovY, aspectRatio, nearPlane, farPlane);//nearPlane, farPlane, fovY, aspectRatio);
+}

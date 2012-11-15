@@ -1,0 +1,24 @@
+﻿Build started 11/15/2012 11:16:08 AM.
+     1>Project "C:\Users\mjsenter\Documents\Com S 336\lighting\assignment6\assignment6.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\assignment6.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\include /I..\RenderUtils /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         Skipping... (no relevant changes detected)
+         main.cpp
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\mjsenter\Documents\Com S 336\lighting\Debug\assignment6.exe" /NOLOGO /LIBPATH:..\lib\windows glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\assignment6.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\mjsenter\Documents\Com S 336\lighting\Debug\assignment6.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\mjsenter\Documents\Com S 336\lighting\Debug\assignment6.lib" /MACHINE:X86 Debug\InitShader.obj
+         Debug\main.obj
+         "C:\Users\mjsenter\Documents\Com S 336\lighting\Debug\RenderUtils.lib"
+         LINK : C:\Users\mjsenter\Documents\Com S 336\lighting\Debug\assignment6.exe not found or not built by the last incremental link; performing full link
+         assignment6.vcxproj -> C:\Users\mjsenter\Documents\Com S 336\lighting\Debug\assignment6.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\mjsenter\Documents\Com S 336\lighting\Debug\assignment6.exe;#1" /manifest Debug\assignment6.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Debug\assignment6.unsuccessfulbuild".
+         Touching "Debug\assignment6.lastbuildstate".
+     1>Done Building Project "C:\Users\mjsenter\Documents\Com S 336\lighting\assignment6\assignment6.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.07
