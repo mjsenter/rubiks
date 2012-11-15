@@ -18,6 +18,9 @@
     <ClCompile Include="..\Common\InitShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fshader_cube_tex.glsl">
