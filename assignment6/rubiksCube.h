@@ -29,7 +29,7 @@ private:
 	  vec4(  0.5, -0.5, -0.5, 1.0 )
 	};
 
-	vec4 cubeColor = {0,0,0,1.0};
+	vec4 cubeColor(0,0,0,1.0);
 
 public:
 	Cube(){

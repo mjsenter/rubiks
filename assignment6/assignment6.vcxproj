@@ -64,7 +64,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\InitShader.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="rubiksCube.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RenderUtils\RenderUtils.vcxproj">
@@ -80,6 +80,9 @@
     <None Include="vshader.glsl" />
     <None Include="vshader_cube_tex.glsl" />
     <None Include="vshader_phong.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="rubiksCube.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

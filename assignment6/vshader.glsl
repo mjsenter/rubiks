@@ -1,13 +1,15 @@
 #version 150
 
-uniform mat4 transform;
+uniform mat4 view;
+uniform mat4 projection;
+uniform vec4 color;
+uniform mat4 model;
 
 in  vec4 vPosition;
-in  vec4 vColor;
 out vec4 fColor;
 
 void main() 
 {
-  fColor = vColor;
-  gl_Position = transform * vPosition;
+  fColor = color;
+  gl_Position = projection * view * model * vPosition;
 } 

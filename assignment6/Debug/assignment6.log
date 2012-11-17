@@ -1,47 +1,15 @@
-﻿Build started 11/15/2012 12:11:36 PM.
+﻿Build started 11/17/2012 2:51:13 PM.
      1>Project "C:\Users\mjsenter\Documents\GitHub\rubiks\assignment6\assignment6.vcxproj" on node 3 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\assignment6.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\include /I..\RenderUtils /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\Common\InitShader.cpp main.cpp
-         main.cpp
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(79): warning C4244: 'initializing' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(84): warning C4244: 'initializing' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(85): warning C4244: 'initializing' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(93): warning C4244: 'initializing' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(95): warning C4244: 'initializing' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(103): warning C4244: 'initializing' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(116): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(145): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(155): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(156): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(157): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(158): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(232): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(236): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(240): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(242): warning C4244: 'initializing' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\sphere.h(243): warning C4244: 'initializing' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\include\teapot.h(26): warning C4305: 'argument' : truncation from 'double' to 'const GLfloat'
-     1>c:\users\mjsenter\documents\github\rubiks\include\teapot.h(127): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(89): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(89): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(89): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(95): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(95): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(95): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(211): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(211): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(216): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
-     1>c:\users\mjsenter\documents\github\rubiks\assignment6\main.cpp(216): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
-         InitShader.cpp
-     1>c:\users\mjsenter\documents\github\rubiks\common\initshader.cpp(10): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-         Generating Code...
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\include /I..\RenderUtils /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt rubiksCube.cpp
+         rubiksCube.cpp
        Link:
          c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\assignment6.exe" /NOLOGO /LIBPATH:..\lib\windows glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\assignment6.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\assignment6.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\assignment6.lib" /MACHINE:X86 Debug\InitShader.obj
-         Debug\main.obj
+         Debug\rubiksCube.obj
          C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\RenderUtils.lib
+         LINK : C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\assignment6.exe not found or not built by the last incremental link; performing full link
          assignment6.vcxproj -> C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\assignment6.exe
        Manifest:
          C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\assignment6.exe;#1" /manifest Debug\assignment6.exe.intermediate.manifest
@@ -52,4 +20,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:05.55
+Time Elapsed 00:00:01.12
