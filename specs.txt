@@ -1,0 +1,19 @@
+At start of program: Input how many pieces you want (nxn) ex: 3x3, 4x4, etc.
+
+OBJECTS:
+8 Corner pieces
+6* (Number of sides - 2)^2 Center pieces
+12*(Number of sides - 2) Edge pieces
+7 colors
+
+CONTROLS:
+Use a cursor approach to select which layer/row you want to rotate.
+V, v - Rotate vertically
+H, h - Rotate horizontally
+Arrow keys Move the Cursor
+WASD keys rotate entire cube
+Q - Quit
+R - reset
+O - Scramble
+
+Give feedback if finished.
