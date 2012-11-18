@@ -23,28 +23,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fshader_cube_tex.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="vshader_cube_tex.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="fshader.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fshader_phong.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fshader_phong_tex_stripes.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fshader_toon.glsl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="vshader.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="vshader_phong.glsl">
+    <None Include="ffaceShader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vfaceShader.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

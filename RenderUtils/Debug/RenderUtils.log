@@ -1,4 +1,4 @@
-﻿Build started 11/17/2012 2:51:13 PM.
+﻿Build started 11/17/2012 10:22:29 PM.
      1>Project "C:\Users\mjsenter\Documents\GitHub\rubiks\RenderUtils\RenderUtils.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\RenderUtils.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -15,4 +15,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.04
+Time Elapsed 00:00:00.03
