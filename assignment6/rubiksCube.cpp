@@ -36,16 +36,16 @@ struct faceNode * faces;
 
 /* Colors:
  * 0: Front - Green
- * 1: Top - White
- * 2: Back - Blue
+ * 1: Back - Blue
+ * 2: Top - White
  * 3: Bottom - Yellow
  * 4: Right - Red
  * 5: Left - Orange
  */
 vec4 colors[6] = {
 	vec4( 0, 0.85, 0, 0 ),
-	vec4( 0.7, 0.7, 0.7, 1.0 ),
 	vec4( 0.0, 0.0, 0.85, 1.0 ),
+	vec4( 0.7, 0.7, 0.7, 1.0 ),	
 	vec4( 0.85, 0.85, 0.0, 1.0 ),
 	vec4( 0.85, 0.0, 0.0, 1.0 ),
 	vec4( 0.85, 0.35, 0.0, 1.0 ) };
@@ -53,14 +53,27 @@ vec4 colors[6] = {
 int dim;
 
 int cursor;	//Index of cursor
+int * cursorMap;
+int frontFace;
+int upFace;
+int rightFace;
 
 
 void init( int dimensions ) {
+	dim = dimensions;
+
 	camera->LookLeft( 25 );
 	camera->LookDown( 25 );
 	camera->MoveForward( 1.5 );
 
 	cursor = 0;
+	cursorMap = new int[dim * dim];
+	for(int i = 0; i < dim * dim; i++ ) {
+		cursorMap[i] = i;
+	}
+	frontFace = 0;
+	upFace = 2;
+	rightFace = 4;
 
 	Cube cube;
 	baseCube = new VertexArray();
@@ -78,7 +91,6 @@ void init( int dimensions ) {
 	face->AddAttribute( "vPosition", facePoints, 4 );
 	faceShader = new Shader( "vfaceShader.glsl", "ffaceShader.glsl" );
 
-	dim = dimensions;
 	faces = new struct faceNode[dim * dim * 6];
 	mat4 scale = Scale( 1 / (GLfloat)dim * 0.9 );
 	for( int i = 0; i < 6; i++ ) {
@@ -92,11 +104,11 @@ void init( int dimensions ) {
 				switch( i ) {
 					case 1:
 						faces[i*dim*dim + j*dim + k].transform = 
-							RotateX( -90 ) * faces[i*dim*dim + j*dim + k].transform;
+							RotateX( 180 ) * faces[i*dim*dim + j*dim + k].transform;
 						break;
 					case 2:
 						faces[i*dim*dim + j*dim + k].transform = 
-							RotateX( 180 ) * faces[i*dim*dim + j*dim + k].transform;
+							RotateX( -90 ) * faces[i*dim*dim + j*dim + k].transform;
 						break;
 					case 3:
 						faces[i*dim*dim + j*dim + k].transform = 
@@ -140,20 +152,19 @@ void display() {
 	for( int i = 0; i < dim*dim*6; i++ ) {
 		faceShader->SetUniform( "color", faces[i].color );
 		faceShader->SetUniform( "model", model * faces[i].transform );
-		faceShader->SetUniform( "cursor", cursor == i );
+		faceShader->SetUniform( "cursor", cursorMap[cursor] == i );
 		faceShader->SetUniform( "view", camera->GetView() );
 		faceShader->SetUniform( "projection", camera->GetProjection() );
 		face->Draw( GL_TRIANGLE_FAN );
 	}
 	face->Unbind();
 	faceShader->Unbind();
-	
-	
 
 	glutSwapBuffers();
 }
 
 void keyboard( unsigned char key, int x, int y ) {
+	int temp;
 	switch( key ) {
 		case 033:
 		case 'q': 
@@ -162,27 +173,34 @@ void keyboard( unsigned char key, int x, int y ) {
 			break; 
 		case 'w':
 			model = RotateX( 90 ) * model;
-			//TODO update cursor
+			temp = frontFace;
+			frontFace = upFace;
+			upFace = temp + ( temp % 2 ? -1 : 1 );
 			break;
 		case 'a':
 			model = RotateY( 90 ) * model;
-			//TODO update cursor
+			temp = rightFace;
+			rightFace = frontFace;
+			frontFace = temp + ( temp % 2 ? -1 : 1 );
 			break;
 		case 'd':  
 			model = RotateY( -90 ) * model;
-			//TODO update cursor
+			temp = frontFace;
+			frontFace = rightFace;
+			rightFace = temp + ( temp % 2 ? -1 : 1 );
 			break;
 		case 's':
 			model = RotateX( -90 ) * model;
-			//TODO update cursor
+			temp = upFace;
+			upFace = frontFace;
+			frontFace = temp + ( temp % 2 ? -1 : 1 );
 			break;
 	}
+	std::cout << "front: " << frontFace << std::endl << "up: " << upFace << std::endl << "right: " << rightFace << std::endl << std::endl;
 	glutPostRedisplay();
 }
 
 void keyboardSpecial( int key, int x, int y ) {
-	//Currently only works on starting rotation.
-	//This was mostly for testing the shading.
 	switch( key ) {
 		case GLUT_KEY_UP:
 			if( cursor >= dim ) {
