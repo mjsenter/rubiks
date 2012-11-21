@@ -23,6 +23,10 @@ Camera * camera = new Camera( vec3( 0.9, 0.9, 2.0 ) );
 VertexArray * baseCube;
 Shader * baseShader;
 mat4 model;
+int animFrame = 1;
+int numAnimFrames = 15;
+int rotDir = 0;
+bool rotating = false;
 
 VertexArray * face;
 Shader * faceShader;
@@ -58,10 +62,11 @@ int frontFace;
 int upFace;
 int rightFace;
 
-int xRot = 0;
-int yRot = 0;
-int zRot = 0;
+// elapsed time
+int elapsedTime;
 
+// frame rate in millis for 30 frames/sec
+const int frameRate = 1000.0 / 30;
 
 void init( int dimensions ) {
 	dim = dimensions;
@@ -171,100 +176,101 @@ void calcCursorMap() {
 	int i, j;
 	int rot = 0;
 	int index = frontFace * dim * dim;
-	std::cout << "Index: " << index << std::endl;
+
+	//Find orientation of cube
 	switch( frontFace ) {
-		case 0:
+		case 0:	//Green face
 			switch( upFace ) {
-				case 2:
+				case 2:	//White face
 					rot = 0;
 					break;
-				case 3:
+				case 3:	//Yellow face
 					rot = 2;
 					break;
-				case 4:
+				case 4:	//Red face
 					rot = 1;
 					break;
-				case 5: 
+				case 5: //Orange face
 					rot = 3;
 					break;
 			}
 			break;
-		case 1:
+		case 1:	//Blue face
 			switch( upFace ) {
-				case 2:
+				case 2:	//White face
 					rot = 0;
 					break;
-				case 3:
+				case 3:	//Yellow face
 					rot = 2;
 					break;
-				case 4:
+				case 4:	//Red face
 					rot = 3;
 					break;
-				case 5: 
+				case 5:	//Orange face
 					rot = 1;
 					break;
 			}
 			break;
-		case 2:
+		case 2:	//White face
 			switch( upFace ) {
-				case 0:
+				case 0:	//Green face
 					rot = 2;
 					break;
-				case 1:
+				case 1:	//Blue face
 					rot = 0;
 					break;
-				case 4:
+				case 4:	//Red face
 					rot = 1;
 					break;
-				case 5: 
+				case 5: //Orange face
 					rot = 3;
 					break;
 			}
 			break;
-		case 3:
+		case 3:	//Yellow face
 			switch( upFace ) {
-				case 0:
+				case 0:	//Green face
 					rot = 2;
 					break;
-				case 1:
+				case 1:	//Blue face
 					rot = 0;
 					break;
-				case 4:
+				case 4:	//Red face
 					rot = 3;
 					break;
-				case 5: 
+				case 5: //Orange face
 					rot = 1;
 					break;
 			}
 			break;
-		case 4:
+		case 4:	//Red face
 			switch( upFace ) {
-				case 0:
+				case 0:	//Green face
 					rot = 3;
 					break;
-				case 1:
+				case 1:	//Blue face
 					rot = 1;
 					break;
-				case 2:
+				case 2:	//White face
 					rot = 0;
 					break;
-				case 3: 
+				case 3:	//Yellow face
 					rot = 2;
 					break;
 			}
 			break;
-		case 5:
+		case 5:	//Orange face
 			switch( upFace ) {
-				case 0:
+				case 0:	//Green face
 					rot = 3;
 					break;
-				case 1:
+				case 1:	//Blue face
 					rot = 1;
 					break;
-				case 2:
+				case 2:	//White face
 					rot = 2;
 					break;
-				case 3: 
+				case 3: //Yellow face
 					rot = 0;
 					break;
 			}
@@ -273,25 +279,26 @@ void calcCursorMap() {
 
 	std::cout << "Rot: " << rot << std::endl;
 
+	//Set cursorMap based on orientation of cube
 	switch( rot ) {
-		case 0:
+		case 0:	//Face oriented up
 			for( i = 0; i < dim * dim; i++ ) {
 				cursorMap[i] = index + i;
 			}
 			break;
-		case 1:
+		case 1:	//Face rotated 90 CW
 			for( i = 0; i < dim; i++ ) {
 				for( j = 0; j < dim; j++ ) {
 					cursorMap[i*dim + j] = dim - i - 1 + j * dim + index;
 				}
 			}
 			break;
-		case 2:
+		case 2:	//Face upside down
 			for( i = 0; i < dim * dim; i++ ) {
 				cursorMap[i] = dim * dim - 1 - i + index;
 			}
 			break;
-		case 3:
+		case 3:	//Face rotated 90 CCW
 			for( i = 0; i < dim; i++ ) {
 				for( j = 0; j < dim; j++ ) {
 					cursorMap[i*dim + j] = i + dim * dim - dim * (j + 1 ) + index;
@@ -304,65 +311,73 @@ void calcCursorMap() {
 }
 
 void keyboard( unsigned char key, int x, int y ) {
-	int temp;
-	switch( key ) {
-		case 033:
-		case 'q': 
-		case 'Q':
-			exit( EXIT_SUCCESS );
-			break; 
-		case 'w':
-			model = RotateX( 90 ) * model;
-			temp = frontFace;
-			frontFace = upFace;
-			upFace = temp + ( temp % 2 ? -1 : 1 );
-			break;
-		case 'a':
-			model = RotateY( 90 ) * model;
-			temp = rightFace;
-			rightFace = frontFace;
-			frontFace = temp + ( temp % 2 ? -1 : 1 );
-			break;
-		case 'd':  
-			model = RotateY( -90 ) * model;
-			temp = frontFace;
-			frontFace = rightFace;
-			rightFace = temp + ( temp % 2 ? -1 : 1 );
-			break;
-		case 's':
-			model = RotateX( -90 ) * model;
-			temp = upFace;
-			upFace = frontFace;
-			frontFace = temp + ( temp % 2 ? -1 : 1 );
-			break;
+	if( !rotating ) { //Dont accept input while rotating
+		int temp;
+		switch( key ) {
+			case 033:
+			case 'q': 
+			case 'Q':
+				exit( EXIT_SUCCESS );
+				break; 
+			case 'w':
+				rotating = true;
+				rotDir = 0;
+				temp = frontFace;
+				frontFace = upFace;
+				upFace = temp + ( temp % 2 ? -1 : 1 );
+				break;
+			case 'a':
+				rotating = true;
+				rotDir = 2;
+				temp = rightFace;
+				rightFace = frontFace;
+				frontFace = temp + ( temp % 2 ? -1 : 1 );
+				break;
+			case 'd':  
+				rotating = true;
+				rotDir = 3;
+				temp = frontFace;
+				frontFace = rightFace;
+				rightFace = temp + ( temp % 2 ? -1 : 1 );
+				break;
+			case 's':
+				rotating = true;
+				rotDir = 1;
+				temp = upFace;
+				upFace = frontFace;
+				frontFace = temp + ( temp % 2 ? -1 : 1 );
+				break;
+		}
+	
+		std::cout << "front: " << frontFace << std::endl << "up: " << upFace << std::endl << "right: " << rightFace << std::endl << std::endl;
+		glutPostRedisplay();
 	}
-	calcCursorMap();
-	std::cout << "front: " << frontFace << std::endl << "up: " << upFace << std::endl << "right: " << rightFace << std::endl << std::endl;
-	glutPostRedisplay();
 }
 
 void keyboardSpecial( int key, int x, int y ) {
-	switch( key ) {
-		case GLUT_KEY_UP:
-			if( cursor >= dim ) {
-				cursor -= dim;
-			}
-			break;
-		case GLUT_KEY_DOWN:
-			if( cursor + dim < dim * dim ) {
-				cursor += dim;
-			}
-			break;
-		case GLUT_KEY_RIGHT:
-			if( cursor % dim != dim - 1 ) {
-				cursor++;
-			}
-			break;
-		case GLUT_KEY_LEFT:
-			if( cursor % dim != 0 ) {
-				cursor--;
-			}
-			break;
+	if( !rotating ) {	//Don't accept input while rotating
+		switch( key ) {
+			case GLUT_KEY_UP:
+				if( cursor >= dim ) {
+					cursor -= dim;
+				}
+				break;
+			case GLUT_KEY_DOWN:
+				if( cursor + dim < dim * dim ) {
+					cursor += dim;
+				}
+				break;
+			case GLUT_KEY_RIGHT:
+				if( cursor % dim != dim - 1 ) {
+					cursor++;
+				}
+				break;
+			case GLUT_KEY_LEFT:
+				if( cursor % dim != 0 ) {
+					cursor--;
+				}
+				break;
+		}
 	}
 	glutPostRedisplay();
 }
@@ -372,23 +387,57 @@ bool isWin() {
 	return false;
 }
 
+void idle( void )
+{
+  int now = glutGet(GLUT_ELAPSED_TIME);
+  if (now - elapsedTime > frameRate)
+  {
+    elapsedTime = now;
+	if( rotating ) {
+		switch( rotDir ) {
+			case 0: 
+				model = RotateX( 1 / (float)numAnimFrames * 90 ) * model;
+				break;
+			case 1:
+				model = RotateX( 1 / (float)numAnimFrames * -90 ) * model;
+				break;
+			case 2:
+				model = RotateY( 1 / (float)numAnimFrames * 90 ) * model;
+				break;
+			case 3:
+				model = RotateY( 1 / (float)numAnimFrames * -90 ) * model;
+				break;
+		}
+		animFrame++;
+		if( animFrame > numAnimFrames ) {
+			animFrame = 1;
+			calcCursorMap();
+			rotating = false;
+		}
+	}
+    glutPostRedisplay();
+  }
+}
+
+
 int main( int argc, char **argv )
 {
-  glutInit( &argc, argv );
+	glutInit( &argc, argv );
 
-  glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
+	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 
-  glutInitWindowSize( 512, 512 );
-  glutCreateWindow( " " );
+	glutInitWindowSize( 512, 512 );
+	glutCreateWindow( " " );
 
-  glewInit();
+	glewInit();
 
-  init( 3 );
+	init( 3 );
 
-  glutDisplayFunc(display);
-  glutKeyboardFunc(keyboard);
-  glutSpecialFunc(keyboardSpecial);
+	glutDisplayFunc(display);
+	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(keyboardSpecial);
+	glutIdleFunc( idle );
 
-  glutMainLoop();
-  return 0;
+	glutMainLoop();
+	return 0;
 }
