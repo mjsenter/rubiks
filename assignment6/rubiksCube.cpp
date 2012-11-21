@@ -58,6 +58,10 @@ int frontFace;
 int upFace;
 int rightFace;
 
+int xRot = 0;
+int yRot = 0;
+int zRot = 0;
+
 
 void init( int dimensions ) {
 	dim = dimensions;
@@ -85,10 +89,10 @@ void init( int dimensions ) {
 	face = new VertexArray();
 	vec4 facePoints[] = {
 		vec3( -0.5, -0.5,  0.0),
-		vec3( -0.5,  0.5,  0.0),
-		vec3(  0.5,  0.5,  0.0),
+		vec3( 0.0,  0.5,  0.0),
+		//vec3(  0.5,  0.5,  0.0),
 		vec3(  0.5, -0.5,  0.0) };
-	face->AddAttribute( "vPosition", facePoints, 4 );
+	face->AddAttribute( "vPosition", facePoints, 3 );
 	faceShader = new Shader( "vfaceShader.glsl", "ffaceShader.glsl" );
 
 	faces = new struct faceNode[dim * dim * 6];
@@ -104,7 +108,7 @@ void init( int dimensions ) {
 				switch( i ) {
 					case 1:
 						faces[i*dim*dim + j*dim + k].transform = 
-							RotateX( 180 ) * faces[i*dim*dim + j*dim + k].transform;
+							RotateZ( 180 ) * RotateX( 180 ) * faces[i*dim*dim + j*dim + k].transform;
 						break;
 					case 2:
 						faces[i*dim*dim + j*dim + k].transform = 
@@ -112,7 +116,7 @@ void init( int dimensions ) {
 						break;
 					case 3:
 						faces[i*dim*dim + j*dim + k].transform = 
-							RotateX( 90 ) * faces[i*dim*dim + j*dim + k].transform;
+							RotateY( 180 ) * RotateX( 90 ) * faces[i*dim*dim + j*dim + k].transform;
 						break;
 					case 4:
 						faces[i*dim*dim + j*dim + k].transform = 
@@ -120,7 +124,7 @@ void init( int dimensions ) {
 						break;
 					case 5:
 						faces[i*dim*dim + j*dim + k].transform = 
-							RotateY( -90 ) * faces[i*dim*dim + j*dim + k].transform;
+							RotateX( 180 ) * RotateY( -90 ) * faces[i*dim*dim + j*dim + k].transform;
 						break;
 				}
 			}
@@ -163,6 +167,143 @@ void display() {
 	glutSwapBuffers();
 }
 
+void calcCursorMap() {
+	int i, j;
+	int rot = 0;
+	int index = frontFace * dim * dim;
+	std::cout << "Index: " << index << std::endl;
+	switch( frontFace ) {
+		case 0:
+			switch( upFace ) {
+				case 2:
+					rot = 0;
+					break;
+				case 3:
+					rot = 2;
+					break;
+				case 4:
+					rot = 1;
+					break;
+				case 5: 
+					rot = 3;
+					break;
+			}
+			break;
+		case 1:
+			switch( upFace ) {
+				case 2:
+					rot = 0;
+					break;
+				case 3:
+					rot = 2;
+					break;
+				case 4:
+					rot = 3;
+					break;
+				case 5: 
+					rot = 1;
+					break;
+			}
+			break;
+		case 2:
+			switch( upFace ) {
+				case 0:
+					rot = 2;
+					break;
+				case 1:
+					rot = 0;
+					break;
+				case 4:
+					rot = 1;
+					break;
+				case 5: 
+					rot = 3;
+					break;
+			}
+			break;
+		case 3:
+			switch( upFace ) {
+				case 0:
+					rot = 2;
+					break;
+				case 1:
+					rot = 0;
+					break;
+				case 4:
+					rot = 3;
+					break;
+				case 5: 
+					rot = 1;
+					break;
+			}
+			break;
+		case 4:
+			switch( upFace ) {
+				case 0:
+					rot = 3;
+					break;
+				case 1:
+					rot = 1;
+					break;
+				case 2:
+					rot = 0;
+					break;
+				case 3: 
+					rot = 2;
+					break;
+			}
+			break;
+		case 5:
+			switch( upFace ) {
+				case 0:
+					rot = 3;
+					break;
+				case 1:
+					rot = 1;
+					break;
+				case 2:
+					rot = 2;
+					break;
+				case 3: 
+					rot = 0;
+					break;
+			}
+			break;
+	}
+
+	std::cout << "Rot: " << rot << std::endl;
+
+	switch( rot ) {
+		case 0:
+			for( i = 0; i < dim * dim; i++ ) {
+				cursorMap[i] = index + i;
+			}
+			break;
+		case 1:
+			for( i = 0; i < dim; i++ ) {
+				for( j = 0; j < dim; j++ ) {
+					cursorMap[i*dim + j] = dim - i - 1 + j * dim + index;
+				}
+			}
+			break;
+		case 2:
+			for( i = 0; i < dim * dim; i++ ) {
+				cursorMap[i] = dim * dim - 1 - i + index;
+			}
+			break;
+		case 3:
+			for( i = 0; i < dim; i++ ) {
+				for( j = 0; j < dim; j++ ) {
+					cursorMap[i*dim + j] = i + dim * dim - dim * (j + 1 ) + index;
+				}
+			}
+			break;
+	}
+	//cursorMap[0] = index;
+	std::cout << "cursor: " << cursor << std::endl;
+	std::cout << "cursorMap: " << cursorMap[cursor] << std::endl;
+}
+
 void keyboard( unsigned char key, int x, int y ) {
 	int temp;
 	switch( key ) {
@@ -196,6 +337,7 @@ void keyboard( unsigned char key, int x, int y ) {
 			frontFace = temp + ( temp % 2 ? -1 : 1 );
 			break;
 	}
+	calcCursorMap();
 	std::cout << "front: " << frontFace << std::endl << "up: " << upFace << std::endl << "right: " << rightFace << std::endl << std::endl;
 	glutPostRedisplay();
 }
