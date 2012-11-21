@@ -89,10 +89,10 @@ void init( int dimensions ) {
 	face = new VertexArray();
 	vec4 facePoints[] = {
 		vec3( -0.5, -0.5,  0.0),
-		vec3( 0.0,  0.5,  0.0),
-		//vec3(  0.5,  0.5,  0.0),
+		vec3( -0.5,  0.5,  0.0),
+		vec3(  0.5,  0.5,  0.0),
 		vec3(  0.5, -0.5,  0.0) };
-	face->AddAttribute( "vPosition", facePoints, 3 );
+	face->AddAttribute( "vPosition", facePoints, 4 );
 	faceShader = new Shader( "vfaceShader.glsl", "ffaceShader.glsl" );
 
 	faces = new struct faceNode[dim * dim * 6];
@@ -299,7 +299,6 @@ void calcCursorMap() {
 			}
 			break;
 	}
-	//cursorMap[0] = index;
 	std::cout << "cursor: " << cursor << std::endl;
 	std::cout << "cursorMap: " << cursorMap[cursor] << std::endl;
 }

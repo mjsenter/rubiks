@@ -1,4 +1,4 @@
-﻿Build started 11/20/2012 9:09:02 PM.
+﻿Build started 11/20/2012 11:28:29 PM.
      1>Project "C:\Users\mjsenter\Documents\GitHub\rubiks\assignment6\assignment6.vcxproj" on node 3 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\assignment6.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -34,4 +34,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.11
+Time Elapsed 00:00:01.15
