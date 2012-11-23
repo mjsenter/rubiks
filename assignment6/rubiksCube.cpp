@@ -38,6 +38,9 @@ struct faceNode {
 
 struct faceNode * faces;
 
+// faceNode used to compare for an isWin state
+struct faceNode * solvedFaces;
+
 /* Colors:
  * 0: Front - Green
  * 1: Back - Blue
@@ -101,6 +104,8 @@ void init( int dimensions ) {
 	faceShader = new Shader( "vfaceShader.glsl", "ffaceShader.glsl" );
 
 	faces = new struct faceNode[dim * dim * 6];
+	solvedFaces = new struct faceNode[dim * dim * 6];
+
 	mat4 scale = Scale( 1 / (GLfloat)dim * 0.9 );
 	for( int i = 0; i < 6; i++ ) {
 		for( int j = 0; j < dim; j++ ) {
@@ -135,7 +140,9 @@ void init( int dimensions ) {
 			}
 		}	
 	}
-
+	for(int i = 0; i < dim * dim * 6; i++){
+		solvedFaces[i] = faces[i];
+	}
 
 	glEnable( GL_DEPTH_TEST );
 	glClearColor( .25, .25, .25, 1.0 );
@@ -382,8 +389,37 @@ void keyboardSpecial( int key, int x, int y ) {
 	glutPostRedisplay();
 }
 
+
+/* isWin() is a boolean that checks to see if the cube is solved.
+ * It checks the front face to see if all of the faces are the same color, then checks the up, then right. 
+ */
 bool isWin() {
 	//TODO ALEX
+	int i;
+	int flag = 0;
+	//Checks to see if 1 face is completed
+	for(i = 0; i< dim * dim; i++){
+		if(solvedFaces[i].color !=  faces[i].color){
+			flag = 1;
+			return false;
+		}
+	}
+	
+	//Checks to see if the next 3 are completed, if so, the cube is considered to be complete
+	if(flag == 0){
+		for(i = dim * dim; i < dim * dim * 3; i++){
+			if(solvedFaces[i].color != faces[i].color){
+				flag = 1;
+				return false;
+			}
+		}
+	}
+	//cube is completed, returns true
+	if(flag == 0){
+		return true;
+	}
+
+	std::cout<<"Front Face: "<< frontFace<<std::endl;
 	return false;
 }
 
@@ -437,7 +473,6 @@ int main( int argc, char **argv )
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(keyboardSpecial);
 	glutIdleFunc( idle );
-
 	glutMainLoop();
 	return 0;
 }
