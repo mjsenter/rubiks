@@ -1,5 +1,6 @@
 
 #include <Angel.h>
+#include <ctime>
 
 class Cube
 {
@@ -39,6 +40,8 @@ class Cube
   {
     return numVertices;
   }
+
+  void scramble(void);
 
 private:
 

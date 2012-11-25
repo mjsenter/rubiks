@@ -27,6 +27,7 @@ int animFrame = 1;
 int numAnimFrames = 15;
 int rotDir = 0;
 bool rotating = false;
+int randomNumber;
 
 VertexArray * face;
 Shader * faceShader;
@@ -37,6 +38,8 @@ struct faceNode {
 };
 
 struct faceNode * faces;
+
+struct faceNode * tempFaces;
 
 // faceNode used to compare for an isWin state
 struct faceNode * solvedFaces;
@@ -105,6 +108,7 @@ void init( int dimensions ) {
 
 	faces = new struct faceNode[dim * dim * 6];
 	solvedFaces = new struct faceNode[dim * dim * 6];
+	tempFaces = new struct faceNode[dim * dim * 6];
 
 	mat4 scale = Scale( 1 / (GLfloat)dim * 0.9 );
 	for( int i = 0; i < 6; i++ ) {
@@ -142,6 +146,7 @@ void init( int dimensions ) {
 	}
 	for(int i = 0; i < dim * dim * 6; i++){
 		solvedFaces[i] = faces[i];
+		tempFaces[i] = faces[i];
 	}
 
 	glEnable( GL_DEPTH_TEST );
@@ -317,6 +322,155 @@ void calcCursorMap() {
 	std::cout << "cursorMap: " << cursorMap[cursor] << std::endl;
 }
 
+
+/* Colors:
+ * 0: Front - Green
+ * 1: Back - Blue
+ * 2: Top - White
+ * 3: Bottom - Yellow
+ * 4: Right - Red
+ * 5: Left - Orange
+ */
+void scramble(void){
+	srand(time(NULL));
+	//randomNumber = rand() % 12;
+
+		randomNumber = rand() % 5;
+		for(int j = 3; j < 4; j++){
+		switch(j){
+			//Left
+			case 0:	
+				for(int i = 0; i< dim; i++){
+
+					faces[i*dim].transform = 
+							 RotateX( 90 ) * faces[i*dim].transform;
+					faces[i*dim + 2*dim*dim ].transform = 
+							 RotateX( 90 ) * faces[i*dim + 2*dim*dim].transform;
+					faces[2*dim*dim - 1 - i*dim].transform = 
+							 RotateX( 90 ) * faces[2*dim*dim - 1 - i*dim].transform;
+					faces[4*dim*dim - 1 - i*dim].transform = 
+							 RotateX( 90 ) * faces[4*dim*dim - 1 - i*dim].transform;
+					
+					
+					
+					tempFaces[i*dim] = faces[i*dim];
+					tempFaces[i*dim + 2*dim*dim] = faces[i*dim + 2*dim*dim];
+					tempFaces[2*dim*dim - 1 - i*dim] = faces[i*dim + 2*dim*dim];
+					tempFaces[4*dim*dim - 1 - i*dim] = faces[i*dim + 2*dim*dim];
+				}
+
+				for(int i = 0; i < dim*dim; i++){
+					faces[5*dim*dim + i].transform = 
+							RotateX(90) * faces[5*dim*dim + i].transform;
+					tempFaces[5*dim*dim + i] = faces[5*dim*dim + i];
+				}
+				break;
+				//Right
+			case 1:
+				for(int i = 0; i< dim; i++){
+
+					faces[i*dim + dim - 1].transform = 
+							 RotateX( -90 ) * faces[i*dim + dim - 1].transform;
+					faces[3*dim*dim - 1 - i*dim].transform = 
+							 RotateX( -90 ) * faces[3*dim*dim - 1 - i*dim].transform;
+					faces[i*dim + dim*dim].transform = 
+							 RotateX( -90 ) * faces[i*dim + dim*dim].transform;
+					faces[i*dim + 3*dim*dim].transform = 
+							 RotateX( -90 ) * faces[i*dim + 3*dim*dim].transform;
+
+					tempFaces[i*dim + dim - 1] = faces[i*dim + dim - 1];
+					tempFaces[3*dim*dim - 1 - i*dim] = faces[3*dim*dim - 1 - i*dim];
+					tempFaces[i*dim + dim*dim] = faces[i*dim + dim*dim];
+					tempFaces[i*dim + 3*dim*dim] = faces[i*dim + 3*dim*dim];
+				}
+				for(int i = 0; i < dim*dim; i++){
+					faces[4*dim*dim + i].transform = 
+							RotateX(-90) * faces[4*dim*dim + i].transform;
+					tempFaces[4*dim*dim + i] = faces[4*dim*dim + i];
+				}
+				break;
+			//Front
+			case 2:
+				for(int i = 0; i< dim; i++){
+
+					faces[i*dim + 4*dim*dim].transform = 
+							 RotateZ( -90 ) * faces[i*dim + 4*dim*dim].transform;
+					faces[3*dim*dim - i - 1].transform = 
+							 RotateZ( -90 ) * faces[3*dim*dim - i - 1].transform;
+					faces[5*dim*dim + i*dim].transform = 
+							 RotateZ( -90 ) * faces[5*dim*dim + i*dim].transform;
+					faces[4*dim*dim - 1 - i].transform = 
+							 RotateZ( -90 ) * faces[4*dim*dim - 1 - i].transform;
+				}
+				for(int i = 0; i < dim*dim; i++){
+					faces[i].transform = 
+							RotateZ(-90) * faces[i].transform;
+				}
+				break;
+			//Back
+			case 3:
+				for(int i = 0; i< dim; i++){
+
+					faces[2*dim*dim + i].transform = 
+										RotateZ( 90 ) * faces[2*dim*dim + i].transform;
+					faces[4*dim*dim + i*dim + dim - 1].transform = 
+										RotateZ( 90 ) * faces[4*dim*dim + i*dim + dim - 1].transform;
+					faces[5*dim*dim + i*dim + dim - 1].transform = 
+										 RotateZ( 90 ) * faces[5*dim*dim + i*dim + dim - 1].transform;
+					faces[3*dim*dim + i].transform = 
+										 RotateZ( 90 ) * faces[3*dim*dim + i].transform;
+				}
+				for(int i = 0; i < dim*dim; i++){
+					faces[dim*dim + i].transform = 
+							RotateZ(90) * faces[dim*dim + i].transform;
+				}
+				break;
+			//Up
+			case 4:
+				for(int i = 0; i< dim; i++){
+
+					faces[i].transform = 
+							 RotateY( -90 ) * faces[i].transform;
+					faces[4*dim*dim + i].transform = 
+							 RotateY( -90 ) * faces[4*dim*dim + i].transform;
+					faces[dim*dim + i].transform = 
+							 RotateY( -90 ) * faces[dim*dim + i].transform;
+					faces[6*dim*dim - i - 1].transform = 
+							 RotateY( -90 ) * faces[6*dim*dim - i - 1].transform;
+				}
+				for(int i = 0; i < dim*dim; i++){
+					faces[2*dim*dim + i].transform = 
+							RotateY(-90) * faces[2*dim*dim + i].transform;
+				}
+				break;
+			//Down
+			case 5:
+				for(int i = 0; i< dim; i++){
+
+					faces[dim*dim - i - 1].transform = 
+							 RotateY( 90 ) * faces[dim*dim - i - 1].transform;
+					faces[5*dim*dim - i - 1].transform = 
+							 RotateY( 90 ) * faces[5*dim*dim - i - 1].transform;
+					faces[2*dim*dim - i - 1].transform = 
+							 RotateY( 90 ) * faces[2*dim*dim - i - 1].transform;
+					faces[5*dim*dim + i ].transform = 
+							 RotateY( 90 ) * faces[5*dim*dim + i].transform;
+				}
+				for(int i = 0; i < dim*dim; i++){
+					faces[4*dim*dim - i - 1].transform = 
+							RotateY(90) * faces[4*dim*dim - i - 1].transform;
+				}
+
+			break;
+		}
+		/*for(int i = 0; i < 6*dim*dim; i++){
+			faces[i] = solvedFaces[i];
+			faces[i] = tempFaces[i];
+		}*/
+		}
+}
+
+
 void keyboard( unsigned char key, int x, int y ) {
 	if( !rotating ) { //Dont accept input while rotating
 		int temp;
@@ -353,6 +507,10 @@ void keyboard( unsigned char key, int x, int y ) {
 				temp = upFace;
 				upFace = frontFace;
 				frontFace = temp + ( temp % 2 ? -1 : 1 );
+				break;
+
+			case 'r':
+				scramble();
 				break;
 		}
 	
@@ -422,6 +580,8 @@ bool isWin() {
 	std::cout<<"Front Face: "<< frontFace<<std::endl;
 	return false;
 }
+
+
 
 void idle( void )
 {
