@@ -1,101 +1,66 @@
-/* TODO
-Alex:
-Randomizer, isWin, rotations
-
-Mike:
-DONE: Shaders, Init Transforms, Cube rotations
-I plan on fixing the cursor.  Feel free to fix it yourself, though.
-Depending on how long this takes to fix I'll work on animating cube rotations.
-
-Keyboard controls
-*/
+#include "rubiksCube.h"
 
 
+rubiksCube::rubiksCube( int dimensions ) {
 
-#include "Angel.h"
-#include "Shader.h"
-#include "VertexArray.h"
-#include "cube.h"
-#include "Camera.h" 
+	colors = (vec4 *)malloc( sizeof( vec4 ) * 6 );
+	colors[0] = vec4( 0, 0.85, 0, 0 );
+	colors[1] = vec4( 0.0, 0.0, 0.85, 1.0 );
+	colors[2] = vec4( 0.7, 0.7, 0.7, 1.0 );
+	colors[3] = vec4( 0.85, 0.85, 0.0, 1.0 );
+	colors[4] = vec4( 0.85, 0.0, 0.0, 1.0 );
+	colors[5] = vec4( 0.85, 0.35, 0.0, 1.0 );
 
-Camera * camera = new Camera( vec3( 0.9, 0.9, 2.0 ) );
-
-VertexArray * baseCube;
-Shader * baseShader;
-mat4 model;
-int animFrame = 1;
-int numAnimFrames = 15;
-int rotDir = 0;
-bool rotating = false;
-int randomNumber;
-
-VertexArray * face;
-Shader * faceShader;
-
-struct faceNode {
-	mat4 transform;
-	vec4 color;
-};
-
-struct faceNode * faces;
-
-struct faceNode * tempFaces;
-
-// faceNode used to compare for an isWin state
-struct faceNode * solvedFaces;
-
-/* Colors:
- * 0: Front - Green
- * 1: Back - Blue
- * 2: Top - White
- * 3: Bottom - Yellow
- * 4: Right - Red
- * 5: Left - Orange
- */
-vec4 colors[6] = {
-	vec4( 0, 0.85, 0, 0 ),
-	vec4( 0.0, 0.0, 0.85, 1.0 ),
-	vec4( 0.7, 0.7, 0.7, 1.0 ),	
-	vec4( 0.85, 0.85, 0.0, 1.0 ),
-	vec4( 0.85, 0.0, 0.0, 1.0 ),
-	vec4( 0.85, 0.35, 0.0, 1.0 ) };
-
-int dim;
-
-int cursor;	//Index of cursor
-int * cursorMap;
-int frontFace;
-int upFace;
-int rightFace;
-
-// elapsed time
-int elapsedTime;
-
-// frame rate in millis for 30 frames/sec
-const int frameRate = 1000.0 / 30;
-
-void init( int dimensions ) {
 	dim = dimensions;
-
-	camera->LookLeft( 25 );
-	camera->LookDown( 25 );
-	camera->MoveForward( 1.5 );
-
 	cursor = 0;
-	cursorMap = new int[dim * dim];
-	for(int i = 0; i < dim * dim; i++ ) {
-		cursorMap[i] = i;
-	}
-	frontFace = 0;
-	upFace = 2;
-	rightFace = 4;
+
+	//Front face setup
+	front = new Side( dimensions, colors[0] );
+	front->back = new Side( dimensions, colors[1] );
+	front->top = new Side( dimensions, colors[2] );
+	front->bottom = new Side( dimensions, colors[3] );
+	front->right = new Side( dimensions, colors[4] );
+	front->left = new Side( dimensions, colors[5] );
+	
+	//Back face setup
+	front->back->back = front;
+	front->back->top = front->bottom;
+	front->back->right = front->right;
+	front->back->left = front->left;
+	front->back->bottom = front->top;
+
+	//Top face setup
+	front->top->back = front->bottom;
+	front->top->top = front->back;
+	front->top->right = front->right;
+	front->top->left = front->left;
+	front->top->bottom = front;
+
+	//Bottom face setup
+	front->bottom->back = front->top;
+	front->bottom->top = front;
+	front->bottom->right = front->right;
+	front->bottom->left = front->left;
+	front->bottom->bottom = front->back;
+
+	//Right face setup
+	front->right->back = front->left;
+	front->right->top = front->top;
+	front->right->right = front->back;
+	front->right->left = front;
+	front->right->bottom = front->bottom;
+
+	//Left face setup
+	front->left->back = front->right;
+	front->left->top = front->bottom;
+	front->left->right = front->back;
+	front->left->left = front;
+	front->left->bottom = front->top;
 
 	Cube cube;
 	baseCube = new VertexArray();
 	baseCube->AddAttribute( "vPosition", cube.getVertices(), cube.getNumVertices() );
 	baseShader = new Shader( "vshader.glsl", "fshader.glsl" );
-	model = Scale( 1.0 );
-
 
 	face = new VertexArray();
 	vec4 facePoints[] = {
@@ -106,533 +71,210 @@ void init( int dimensions ) {
 	face->AddAttribute( "vPosition", facePoints, 4 );
 	faceShader = new Shader( "vfaceShader.glsl", "ffaceShader.glsl" );
 
-	faces = new struct faceNode[dim * dim * 6];
-	solvedFaces = new struct faceNode[dim * dim * 6];
-	tempFaces = new struct faceNode[dim * dim * 6];
-
-	mat4 scale = Scale( 1 / (GLfloat)dim * 0.9 );
-	for( int i = 0; i < 6; i++ ) {
-		for( int j = 0; j < dim; j++ ) {
-			for( int k = 0; k < dim; k++ ) {
-				faces[i*dim*dim + j*dim + k].transform = 
-					Translate( (GLfloat)1/(2*dim) + (GLfloat)k/dim, -(GLfloat)1/(2*dim) - (GLfloat)j/dim, 0.0 ) * 
-					Translate( -0.5, 0.5, 0.51 ) * 
-					scale;
-				faces[i*dim*dim + j*dim + k].color = colors[i];
-				switch( i ) {
-					case 1:
-						faces[i*dim*dim + j*dim + k].transform = 
-							RotateZ( 180 ) * RotateX( 180 ) * faces[i*dim*dim + j*dim + k].transform;
-						break;
-					case 2:
-						faces[i*dim*dim + j*dim + k].transform = 
-							RotateX( -90 ) * faces[i*dim*dim + j*dim + k].transform;
-						break;
-					case 3:
-						faces[i*dim*dim + j*dim + k].transform = 
-							RotateY( 180 ) * RotateX( 90 ) * faces[i*dim*dim + j*dim + k].transform;
-						break;
-					case 4:
-						faces[i*dim*dim + j*dim + k].transform = 
-							RotateY( 90 ) * faces[i*dim*dim + j*dim + k].transform;
-						break;
-					case 5:
-						faces[i*dim*dim + j*dim + k].transform = 
-							RotateX( 180 ) * RotateY( -90 ) * faces[i*dim*dim + j*dim + k].transform;
-						break;
-				}
-			}
-		}	
-	}
-	for(int i = 0; i < dim * dim * 6; i++){
-		solvedFaces[i] = faces[i];
-		tempFaces[i] = faces[i];
-	}
-
-	glEnable( GL_DEPTH_TEST );
-	glClearColor( .25, .25, .25, 1.0 );
 }
 
-void display() {
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+rubiksCube::Side::Side( int dim, vec4 color ) {
+	homeColor = color;
+	colors = (vec4 *)malloc( sizeof( vec4 ) * dim * dim );
+	for( int i = 0; i < dim * dim; i++ ) {
+		colors[i] = color;
+	}
+}
 
-	//Draw baseCube
+void rubiksCube::displayCube( const mat4 & view, const mat4 & proj ) {
+	//Display baseCube
 	baseShader->Bind();
-	baseShader->SetUniform( "model", model );
-	baseShader->SetUniform( "view", camera->GetView() );
-	baseShader->SetUniform( "projection", camera->GetProjection() );
+	baseShader->SetUniform( "view", view );
+	baseShader->SetUniform( "model", Scale(1.0) );
+	baseShader->SetUniform( "projection", proj );
 	baseShader->SetUniform( "color", vec4( 0.0, 0.0, 0.0, 1.0 ) );
 	baseCube->Bind( *baseShader );
 	baseCube->Draw( GL_TRIANGLES );
 	baseCube->Unbind();
 	baseShader->Unbind();
 
-	//Draw faces
 	faceShader->Bind();
 	face->Bind( *faceShader );
-	for( int i = 0; i < dim*dim*6; i++ ) {
-		faceShader->SetUniform( "color", faces[i].color );
-		faceShader->SetUniform( "model", model * faces[i].transform );
-		faceShader->SetUniform( "cursor", cursorMap[cursor] == i );
-		faceShader->SetUniform( "view", camera->GetView() );
-		faceShader->SetUniform( "projection", camera->GetProjection() );
-		face->Draw( GL_TRIANGLE_FAN );
-	}
+	drawFace( view, proj, 0, front, true );
+	drawFace( view, proj, 1, front->back, false );
+	drawFace( view, proj, 2, front->top, false );
+	drawFace( view, proj, 3, front->bottom, false );
+	drawFace( view, proj, 4, front->right, false );
+	drawFace( view, proj, 5, front->left, false );
 	face->Unbind();
 	faceShader->Unbind();
-
-	glutSwapBuffers();
 }
 
-void calcCursorMap() {
-	int i, j;
-	int rot = 0;
-	int index = frontFace * dim * dim;
-
-	//Find orientation of cube
-	switch( frontFace ) {
-		case 0:	//Green face
-			switch( upFace ) {
-				case 2:	//White face
-					rot = 0;
+void rubiksCube::drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor ) {
+	mat4 scale = Scale( 1 / (GLfloat)dim * 0.9 );
+	for( int i = 0; i < dim; i++ ) {
+		for( int j = 0; j < dim; j++ ) {
+			vec4 col = side->colors[i*dim + j];
+			faceShader->SetUniform( "color", side->colors[i*dim + j] );
+			mat4 model = Translate( (GLfloat)1/(2*dim) + 
+					(GLfloat)j/dim, -(GLfloat)1/(2*dim) - 
+					(GLfloat)i/dim, 0.0 ) * 
+				Translate( -0.5, 0.5, 0.51 ) * 
+				scale;
+			switch( rot ) {
+				case 1:
+					model = RotateY( 180 ) * model;
 					break;
-				case 3:	//Yellow face
-					rot = 2;
+				case 2:
+					model = RotateX( -90 ) * model;
 					break;
-				case 4:	//Red face
-					rot = 1;
+				case 3:
+					model = RotateX( 90 ) * model;
 					break;
-				case 5: //Orange face
-					rot = 3;
+				case 4:
+					model = RotateY( 90 ) * model;
 					break;
-			}
-			break;
-		case 1:	//Blue face
-			switch( upFace ) {
-				case 2:	//White face
-					rot = 0;
-					break;
-				case 3:	//Yellow face
-					rot = 2;
-					break;
-				case 4:	//Red face
-					rot = 3;
-					break;
-				case 5:	//Orange face
-					rot = 1;
+				case 5:
+					model = RotateY( -90 ) * model;
 					break;
 			}
-			break;
-		case 2:	//White face
-			switch( upFace ) {
-				case 0:	//Green face
-					rot = 2;
-					break;
-				case 1:	//Blue face
-					rot = 0;
-					break;
-				case 4:	//Red face
-					rot = 1;
-					break;
-				case 5: //Orange face
-					rot = 3;
-					break;
-			}
-			break;
-		case 3:	//Yellow face
-			switch( upFace ) {
-				case 0:	//Green face
-					rot = 2;
-					break;
-				case 1:	//Blue face
-					rot = 0;
-					break;
-				case 4:	//Red face
-					rot = 3;
-					break;
-				case 5: //Orange face
-					rot = 1;
-					break;
-			}
-			break;
-		case 4:	//Red face
-			switch( upFace ) {
-				case 0:	//Green face
-					rot = 3;
-					break;
-				case 1:	//Blue face
-					rot = 1;
-					break;
-				case 2:	//White face
-					rot = 0;
-					break;
-				case 3:	//Yellow face
-					rot = 2;
-					break;
-			}
-			break;
-		case 5:	//Orange face
-			switch( upFace ) {
-				case 0:	//Green face
-					rot = 3;
-					break;
-				case 1:	//Blue face
-					rot = 1;
-					break;
-				case 2:	//White face
-					rot = 2;
-					break;
-				case 3: //Yellow face
-					rot = 0;
-					break;
-			}
-			break;
+			faceShader->SetUniform( "model", model );
+			faceShader->SetUniform( "cursor", cursor == i*dim + j && drawCursor);
+			faceShader->SetUniform( "view", view );
+			faceShader->SetUniform( "projection", proj );
+			face->Draw( GL_TRIANGLE_FAN );
+		}
 	}
-
-	std::cout << "Rot: " << rot << std::endl;
-
-	//Set cursorMap based on orientation of cube
-	switch( rot ) {
-		case 0:	//Face oriented up
-			for( i = 0; i < dim * dim; i++ ) {
-				cursorMap[i] = index + i;
-			}
-			break;
-		case 1:	//Face rotated 90 CW
-			for( i = 0; i < dim; i++ ) {
-				for( j = 0; j < dim; j++ ) {
-					cursorMap[i*dim + j] = dim - i - 1 + j * dim + index;
-				}
-			}
-			break;
-		case 2:	//Face upside down
-			for( i = 0; i < dim * dim; i++ ) {
-				cursorMap[i] = dim * dim - 1 - i + index;
-			}
-			break;
-		case 3:	//Face rotated 90 CCW
-			for( i = 0; i < dim; i++ ) {
-				for( j = 0; j < dim; j++ ) {
-					cursorMap[i*dim + j] = i + dim * dim - dim * (j + 1 ) + index;
-				}
-			}
-			break;
-	}
-	std::cout << "cursor: " << cursor << std::endl;
-	std::cout << "cursorMap: " << cursorMap[cursor] << std::endl;
 }
 
-
-/* Colors:
- * 0: Front - Green
- * 1: Back - Blue
- * 2: Top - White
- * 3: Bottom - Yellow
- * 4: Right - Red
- * 5: Left - Orange
- */
-void scramble(void){
-	srand(time(NULL));
-	//randomNumber = rand() % 12;
-
-		randomNumber = rand() % 5;
-		for(int j = 3; j < 4; j++){
-		switch(j){
-			//Left
-			case 0:	
-				for(int i = 0; i< dim; i++){
-
-					faces[i*dim].transform = 
-							 RotateX( 90 ) * faces[i*dim].transform;
-					faces[i*dim + 2*dim*dim ].transform = 
-							 RotateX( 90 ) * faces[i*dim + 2*dim*dim].transform;
-					faces[2*dim*dim - 1 - i*dim].transform = 
-							 RotateX( 90 ) * faces[2*dim*dim - 1 - i*dim].transform;
-					faces[4*dim*dim - 1 - i*dim].transform = 
-							 RotateX( 90 ) * faces[4*dim*dim - 1 - i*dim].transform;
-					
-					
-					
-					tempFaces[i*dim] = faces[i*dim];
-					tempFaces[i*dim + 2*dim*dim] = faces[i*dim + 2*dim*dim];
-					tempFaces[2*dim*dim - 1 - i*dim] = faces[i*dim + 2*dim*dim];
-					tempFaces[4*dim*dim - 1 - i*dim] = faces[i*dim + 2*dim*dim];
-				}
-
-				for(int i = 0; i < dim*dim; i++){
-					faces[5*dim*dim + i].transform = 
-							RotateX(90) * faces[5*dim*dim + i].transform;
-					tempFaces[5*dim*dim + i] = faces[5*dim*dim + i];
-				}
-				break;
-				//Right
-			case 1:
-				for(int i = 0; i< dim; i++){
-
-					faces[i*dim + dim - 1].transform = 
-							 RotateX( -90 ) * faces[i*dim + dim - 1].transform;
-					faces[3*dim*dim - 1 - i*dim].transform = 
-							 RotateX( -90 ) * faces[3*dim*dim - 1 - i*dim].transform;
-					faces[i*dim + dim*dim].transform = 
-							 RotateX( -90 ) * faces[i*dim + dim*dim].transform;
-					faces[i*dim + 3*dim*dim].transform = 
-							 RotateX( -90 ) * faces[i*dim + 3*dim*dim].transform;
-
-					tempFaces[i*dim + dim - 1] = faces[i*dim + dim - 1];
-					tempFaces[3*dim*dim - 1 - i*dim] = faces[3*dim*dim - 1 - i*dim];
-					tempFaces[i*dim + dim*dim] = faces[i*dim + dim*dim];
-					tempFaces[i*dim + 3*dim*dim] = faces[i*dim + 3*dim*dim];
-				}
-				for(int i = 0; i < dim*dim; i++){
-					faces[4*dim*dim + i].transform = 
-							RotateX(-90) * faces[4*dim*dim + i].transform;
-					tempFaces[4*dim*dim + i] = faces[4*dim*dim + i];
-				}
-				break;
-			//Front
-			case 2:
-				for(int i = 0; i< dim; i++){
-
-					faces[i*dim + 4*dim*dim].transform = 
-							 RotateZ( -90 ) * faces[i*dim + 4*dim*dim].transform;
-					faces[3*dim*dim - i - 1].transform = 
-							 RotateZ( -90 ) * faces[3*dim*dim - i - 1].transform;
-					faces[5*dim*dim + i*dim].transform = 
-							 RotateZ( -90 ) * faces[5*dim*dim + i*dim].transform;
-					faces[4*dim*dim - 1 - i].transform = 
-							 RotateZ( -90 ) * faces[4*dim*dim - 1 - i].transform;
-				}
-				for(int i = 0; i < dim*dim; i++){
-					faces[i].transform = 
-							RotateZ(-90) * faces[i].transform;
-				}
-				break;
-			//Back
-			case 3:
-				for(int i = 0; i< dim; i++){
-
-					faces[2*dim*dim + i].transform = 
-										RotateZ( 90 ) * faces[2*dim*dim + i].transform;
-					faces[4*dim*dim + i*dim + dim - 1].transform = 
-										RotateZ( 90 ) * faces[4*dim*dim + i*dim + dim - 1].transform;
-					faces[5*dim*dim + i*dim + dim - 1].transform = 
-										 RotateZ( 90 ) * faces[5*dim*dim + i*dim + dim - 1].transform;
-					faces[3*dim*dim + i].transform = 
-										 RotateZ( 90 ) * faces[3*dim*dim + i].transform;
-				}
-				for(int i = 0; i < dim*dim; i++){
-					faces[dim*dim + i].transform = 
-							RotateZ(90) * faces[dim*dim + i].transform;
-				}
-				break;
-			//Up
-			case 4:
-				for(int i = 0; i< dim; i++){
-
-					faces[i].transform = 
-							 RotateY( -90 ) * faces[i].transform;
-					faces[4*dim*dim + i].transform = 
-							 RotateY( -90 ) * faces[4*dim*dim + i].transform;
-					faces[dim*dim + i].transform = 
-							 RotateY( -90 ) * faces[dim*dim + i].transform;
-					faces[6*dim*dim - i - 1].transform = 
-							 RotateY( -90 ) * faces[6*dim*dim - i - 1].transform;
-				}
-				for(int i = 0; i < dim*dim; i++){
-					faces[2*dim*dim + i].transform = 
-							RotateY(-90) * faces[2*dim*dim + i].transform;
-				}
-				break;
-			//Down
-			case 5:
-				for(int i = 0; i< dim; i++){
-
-					faces[dim*dim - i - 1].transform = 
-							 RotateY( 90 ) * faces[dim*dim - i - 1].transform;
-					faces[5*dim*dim - i - 1].transform = 
-							 RotateY( 90 ) * faces[5*dim*dim - i - 1].transform;
-					faces[2*dim*dim - i - 1].transform = 
-							 RotateY( 90 ) * faces[2*dim*dim - i - 1].transform;
-					faces[5*dim*dim + i ].transform = 
-							 RotateY( 90 ) * faces[5*dim*dim + i].transform;
-				}
-				for(int i = 0; i < dim*dim; i++){
-					faces[4*dim*dim - i - 1].transform = 
-							RotateY(90) * faces[4*dim*dim - i - 1].transform;
-				}
-
-			break;
-		}
-		/*for(int i = 0; i < 6*dim*dim; i++){
-			faces[i] = solvedFaces[i];
-			faces[i] = tempFaces[i];
-		}*/
-		}
-}
-
-
-void keyboard( unsigned char key, int x, int y ) {
-	if( !rotating ) { //Dont accept input while rotating
-		int temp;
-		switch( key ) {
-			case 033:
-			case 'q': 
-			case 'Q':
-				exit( EXIT_SUCCESS );
-				break; 
-			case 'w':
-				rotating = true;
-				rotDir = 0;
-				temp = frontFace;
-				frontFace = upFace;
-				upFace = temp + ( temp % 2 ? -1 : 1 );
-				break;
-			case 'a':
-				rotating = true;
-				rotDir = 2;
-				temp = rightFace;
-				rightFace = frontFace;
-				frontFace = temp + ( temp % 2 ? -1 : 1 );
-				break;
-			case 'd':  
-				rotating = true;
-				rotDir = 3;
-				temp = frontFace;
-				frontFace = rightFace;
-				rightFace = temp + ( temp % 2 ? -1 : 1 );
-				break;
-			case 's':
-				rotating = true;
-				rotDir = 1;
-				temp = upFace;
-				upFace = frontFace;
-				frontFace = temp + ( temp % 2 ? -1 : 1 );
-				break;
-
-			case 'r':
-				scramble();
-				break;
-		}
+void rubiksCube::rotate(int index,bool v, bool d) {
+	int column;
+	int row;
+	Side *tempFront = front;
+	column = index % dim;
+	row = index / dim;
 	
-		std::cout << "front: " << frontFace << std::endl << "up: " << upFace << std::endl << "right: " << rightFace << std::endl << std::endl;
-		glutPostRedisplay();
-	}
-}
-
-void keyboardSpecial( int key, int x, int y ) {
-	if( !rotating ) {	//Don't accept input while rotating
-		switch( key ) {
-			case GLUT_KEY_UP:
-				if( cursor >= dim ) {
-					cursor -= dim;
-				}
-				break;
-			case GLUT_KEY_DOWN:
-				if( cursor + dim < dim * dim ) {
-					cursor += dim;
-				}
-				break;
-			case GLUT_KEY_RIGHT:
-				if( cursor % dim != dim - 1 ) {
-					cursor++;
-				}
-				break;
-			case GLUT_KEY_LEFT:
-				if( cursor % dim != 0 ) {
-					cursor--;
-				}
-				break;
+	//Vertical
+	if(v){
+		//rotate up
+		if(d){
+			for(int i = 0; i < dim; i++){
+				front->colors[column + i*dim] = front->bottom->colors[column + i*dim];
+				front->bottom->colors[column + i*dim]  = front->back->colors[column + i*dim];
+				front->back->colors[column + i*dim] = front->top->colors[column + i*dim];
+				front->top->colors[column + i*dim] = tempFront->colors[column + i*dim];
+			}
 		}
-	}
-	glutPostRedisplay();
-}
-
-
-/* isWin() is a boolean that checks to see if the cube is solved.
- * It checks the front face to see if all of the faces are the same color, then checks the up, then right. 
- */
-bool isWin() {
-	//TODO ALEX
-	int i;
-	int flag = 0;
-	//Checks to see if 1 face is completed
-	for(i = 0; i< dim * dim; i++){
-		if(solvedFaces[i].color !=  faces[i].color){
-			flag = 1;
-			return false;
+		//rotate down
+		if(!d){
+			for(int i = 0; i < dim; i++){
+				front->colors[column + i*dim] = front->top->colors[column + i*dim];
+				front->top->colors[column + i*dim] = front->back->colors[column + i*dim];
+				front->back->colors[column + i*dim] = front->bottom->colors[column + i*dim];
+				front->bottom->colors[column + i*dim] = tempFront->colors[column + i*dim];
+			}
 		}
 	}
 	
-	//Checks to see if the next 3 are completed, if so, the cube is considered to be complete
-	if(flag == 0){
-		for(i = dim * dim; i < dim * dim * 3; i++){
-			if(solvedFaces[i].color != faces[i].color){
-				flag = 1;
-				return false;
+	//Horizontal
+	if(!v) {
+		//rotate right
+		if(d) {
+			for(int i = 0; i < dim; i++) {
+				front->colors[row + i] = front->left->colors[row + i];
+				front->left->colors[row + i] = front->back->colors[row + i];
+				front->back->colors[row + i] = front->right->colors[row + i];
+				front->right->colors[row + i] = tempFront->colors[row + i];
+			}
+			if(index < dim){
+				Side * tempTop = front->top;
+				
+				for( int i = 0; i < dim; i++ ) {
+					for( int j = 0; j < dim; j++ ) {
+						front->top->colors[i*dim + j] = tempTop->colors[i + dim * dim - dim * (j + 1 )];
+					}
+				}
+			}
+			else if(index > (dim * dim - dim)){
+				Side * tempTop = front->top;
+				for( int i = 0; i < dim; i++ ) {
+					for( int j = 0; j < dim; j++ ) {
+						front->top->colors[i*dim + j] = tempTop->colors[dim - i - 1 + j * dim];
+					}
+				}
+			}
+		}
+		//rotate left
+		if(!d){
+			for(int i = 0; i < dim; i++){
+				front->colors[row + i] = front->right->colors[row + i];
+				front->right->colors[row + i] = front->back->colors[row + i];
+				front->back->colors[row + i] = front->left->colors[row + i];
+				front->left->colors[row + i] = tempFront->colors[row + i];
+			}
+			if(index < dim){
+				Side * tempTop = front->top;
+				for( int i = 0; i < dim; i++ ) {
+					for( int j = 0; j < dim; j++ ) {
+						front->top->colors[i*dim + j] = tempTop->colors[dim - i - 1 + j * dim];
+					}
+				}
+			}
+			if(index > (dim * dim - dim)){
+			Side * tempTop = front->top;
+				for( int i = 0; i < dim; i++ ) {
+					for( int j = 0; j < dim; j++ ) {
+						front->top->colors[i*dim + j] = tempTop->colors[i + dim * dim - dim * (j + 1 )];
+					}
+				}	
 			}
 		}
 	}
-	//cube is completed, returns true
-	if(flag == 0){
-		return true;
-	}
-
-	std::cout<<"Front Face: "<< frontFace<<std::endl;
-	return false;
 }
 
-
-
-void idle( void )
-{
-  int now = glutGet(GLUT_ELAPSED_TIME);
-  if (now - elapsedTime > frameRate)
-  {
-    elapsedTime = now;
-	if( rotating ) {
-		switch( rotDir ) {
-			case 0: 
-				model = RotateX( 1 / (float)numAnimFrames * 90 ) * model;
-				break;
-			case 1:
-				model = RotateX( 1 / (float)numAnimFrames * -90 ) * model;
-				break;
-			case 2:
-				model = RotateY( 1 / (float)numAnimFrames * 90 ) * model;
-				break;
-			case 3:
-				model = RotateY( 1 / (float)numAnimFrames * -90 ) * model;
-				break;
+void rubiksCube::rotateCube( int dir ) {
+	Side * tempFront = front;
+	
+	if(dir == 0){
+		for(int i = 0; i< dim; i++){
+			rotate(i*dim, 0, 1);
 		}
-		animFrame++;
-		if( animFrame > numAnimFrames ) {
-			animFrame = 1;
-			calcCursorMap();
-			rotating = false;
-		}
+		/*
+		front = front->left;
+		front.left = front.back;
+		front.back = front.right;
+		front.right = tempfront;
+		*/
 	}
-    glutPostRedisplay();
-  }
+	if(dir == 1){
+		for(int i = 0; i< dim; i++){
+			rotate(i*dim, 0, 0);
+		}
+		/*
+		front = front.right;
+		front.right = front.back;
+		front.back = front.left;
+		front.left = tempFront;
+		*/
+	}
+	if(dir == 2){
+		for(int i = 0; i< dim; i++){
+			rotate(i*dim, 1, 1);
+		}
+		/*
+		front = front.bottom;
+		front.bottom = front.back;
+		front.back = front.top;
+		front.top = tempFront;
+		*/
+	}
+	if(dir == 3){
+		for(int i = 0; i< dim; i++){
+			rotate(i*dim, 1, 0);
+		}
+		/*
+		front = front.top;
+		front.top = front.back;
+		front.back = front.bottom;
+		front.bottom = tempFront;
+		*/
+	}
 }
-
-
-int main( int argc, char **argv )
-{
-	glutInit( &argc, argv );
-
-	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
-
-	glutInitWindowSize( 512, 512 );
-	glutCreateWindow( " " );
-
-	glewInit();
-
-	init( 3 );
-
-	glutDisplayFunc(display);
-	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(keyboardSpecial);
-	glutIdleFunc( idle );
-	glutMainLoop();
-	return 0;
-}
+void rubiksCube::reset() {}
+void rubiksCube::scramble() {}
+bool rubiksCube::isWin() {return false;}

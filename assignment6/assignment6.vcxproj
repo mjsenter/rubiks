@@ -64,6 +64,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\InitShader.cpp" />
+    <ClCompile Include="rubiks.cpp" />
     <ClCompile Include="rubiksCube.cpp" />
   </ItemGroup>
   <ItemGroup>

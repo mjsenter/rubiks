@@ -4,43 +4,57 @@
 #include "Angel.h"
 #include "Shader.h"
 #include "VertexArray.h"
+#include "cube.h"
 
-class Cube{
+class rubiksCube{
 private:
-
-	struct piece{
-		struct face *faces[3];
-		mat4 transform;
+	class Side {
+		public:
+			Side( int dim, vec4 color );
+			vec4 homeColor;
+			vec4 * colors;
+			Side * back;
+			Side * right;
+			Side * left;
+			Side * top;
+			Side * bottom;
 	};
+	Side * front;
 
-	struct face{
-		vec4 color;
-		vec3 points[4];
-	};
-/*Cube*/
-	vec4 cubeVertices[8] = {
-	  vec4( -0.5, -0.5,  0.5, 1.0 ),
-	  vec4( -0.5,  0.5,  0.5, 1.0 ),
-	  vec4(  0.5,  0.5,  0.5, 1.0 ),
-	  vec4(  0.5, -0.5,  0.5, 1.0 ),
-	  vec4( -0.5, -0.5, -0.5, 1.0 ),
-	  vec4( -0.5,  0.5, -0.5, 1.0 ),
-	  vec4(  0.5,  0.5, -0.5, 1.0 ),
-	  vec4(  0.5, -0.5, -0.5, 1.0 )
-	};
+	/* Colors:
+	 * 0: Front - Green
+	 * 1: Back - Blue
+	 * 2: Top - White
+	 * 3: Bottom - Yellow
+	 * 4: Right - Red
+	 * 5: Left - Orange
+	 */
+	 vec4 * colors;
 
-	vec4 cubeColor(0,0,0,1.0);
+	VertexArray * baseCube;
+	Shader * baseShader;
+	VertexArray * face;
+	Shader * faceShader;
+
+	int cursor;
+	int dim;
+
+	void drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor );
 
 public:
-	Cube(){
-		Cube(3);
+	rubiksCube(){
+		rubiksCube(3);
 	}
-	Cube(int numberOfSides);
-	~Cube();
+	rubiksCube(int numberOfSides);
+	//~rubiksCube();
 	//Index of array, vertical or horizontal, up or down
+	
+
+	void displayCube( const mat4 & view, const mat4 & proj );
 	void rotate(int index,bool v, bool d);
+	void rotateCube( int dir );
 	void reset();
 	void scramble();
-
-}
+	bool isWin();
+};
 #endif

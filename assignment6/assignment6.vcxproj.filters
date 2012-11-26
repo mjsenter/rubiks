@@ -21,6 +21,9 @@
     <ClCompile Include="rubiksCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rubiks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fshader.glsl">
