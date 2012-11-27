@@ -36,8 +36,6 @@ private:
 	VertexArray * face;
 	Shader * faceShader;
 
-	int cursor;
-	int dim;
 
 	void drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor );
 
@@ -56,5 +54,8 @@ public:
 	void reset();
 	void scramble();
 	bool isWin();
+
+	int cursor;
+	int dim;
 };
 #endif

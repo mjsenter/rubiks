@@ -49,41 +49,48 @@ void keyboard( unsigned char key, int x, int y ) {
 				cube->rotateCube( 3 );
 				break;
 
-		//	case 'r':
-		//		//scramble();
-		//		break;
-		//}
-		
+			case 'r':
+				//scramble();
+				cube->rotate(1, true, false);
+				break;
+			case 'R':
+				cube->rotate(1, true, true);
+				break;
+			case 't':
+				cube->rotate(3, false, true);
+				break;
+			case 'T':
+				cube->rotate(3, false, false);
+				break;
+			
 	}
 	glutPostRedisplay();
 }
 
 void keyboardSpecial( int key, int x, int y ) {
-	//if( !rotating ) {	//Don't accept input while rotating
-	//	switch( key ) {
-	//		case GLUT_KEY_UP:
-	//			if( cursor >= dim ) {
-	//				cursor -= dim;
-	//			}
-	//			break;
-	//		case GLUT_KEY_DOWN:
-	//			if( cursor + dim < dim * dim ) {
-	//				cursor += dim;
-	//			}
-	//			break;
-	//		case GLUT_KEY_RIGHT:
-	//			if( cursor % dim != dim - 1 ) {
-	//				cursor++;
-	//			}
-	//			break;
-	//		case GLUT_KEY_LEFT:
-	//			if( cursor % dim != 0 ) {
-	//				cursor--;
-	//			}
-	//			break;
-	//	}
-	//}
-	//glutPostRedisplay();
+		switch( key ) {
+			case GLUT_KEY_UP:
+				if( cube->cursor >= cube->dim ) {
+					cube->cursor -= cube->dim;
+				}
+				break;
+			case GLUT_KEY_DOWN:
+				if( cube->cursor + cube->dim < cube->dim * cube->dim ) {
+					cube->cursor += cube->dim;
+				}
+				break;
+			case GLUT_KEY_RIGHT:
+				if( cube->cursor % cube->dim != cube->dim - 1 ) {
+					cube->cursor++;
+				}
+				break;
+			case GLUT_KEY_LEFT:
+				if( cube->cursor % cube->dim != 0 ) {
+					cube->cursor--;
+				}
+				break;
+		}
+	glutPostRedisplay();
 }
 
 int main( int argc, char **argv )

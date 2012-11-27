@@ -1,5 +1,5 @@
-﻿Build started 11/26/2012 4:26:51 PM.
-     1>Project "C:\Users\mjsenter\Documents\GitHub\rubiks\RenderUtils\RenderUtils.vcxproj" on node 2 (build target(s)).
+﻿Build started 11/27/2012 12:08:56 PM.
+     1>Project "C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\RenderUtils\RenderUtils.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\RenderUtils.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
@@ -7,12 +7,12 @@
          All outputs are up-to-date.
        Lib:
          All outputs are up-to-date.
-         RenderUtils.vcxproj -> C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\RenderUtils.lib
+         RenderUtils.vcxproj -> C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\RenderUtils.lib
        FinalizeBuildStatus:
          Deleting file "Debug\RenderUtils.unsuccessfulbuild".
          Touching "Debug\RenderUtils.lastbuildstate".
-     1>Done Building Project "C:\Users\mjsenter\Documents\GitHub\rubiks\RenderUtils\RenderUtils.vcxproj" (build target(s)).
+     1>Done Building Project "C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\RenderUtils\RenderUtils.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.03
+Time Elapsed 00:00:00.14
