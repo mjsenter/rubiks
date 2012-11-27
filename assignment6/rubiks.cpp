@@ -52,15 +52,19 @@ void keyboard( unsigned char key, int x, int y ) {
 			case 'r':
 				//scramble();
 				cube->rotate(1, true, false);
+				cube->isWin();
 				break;
 			case 'R':
 				cube->rotate(1, true, true);
+				cube->isWin();
 				break;
 			case 't':
 				cube->rotate(3, false, true);
+				cube->isWin();
 				break;
 			case 'T':
 				cube->rotate(3, false, false);
+				cube->isWin();
 				break;
 
 			//Reset cube

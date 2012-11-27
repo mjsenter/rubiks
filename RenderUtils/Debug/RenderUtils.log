@@ -1,18 +1,54 @@
-﻿Build started 11/27/2012 1:33:11 PM.
-     1>Project "C:\Users\mjsenter\Documents\GitHub\rubiks\RenderUtils\RenderUtils.vcxproj" on node 2 (build target(s)).
+﻿Build started 11/27/2012 5:41:11 PM.
+     1>Project "C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\RenderUtils\RenderUtils.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\RenderUtils.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         All outputs are up-to-date.
-         All outputs are up-to-date.
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\include /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Camera.cpp DepthTexture2D.cpp FrameBuffer.cpp Noise.cpp ObjFile.cpp Shader.cpp Texture.cpp Texture1D.cpp Texture2D.cpp Texture3D.cpp TextureCube.cpp VertexArray.cpp
+         VertexArray.cpp
+         TextureCube.cpp
+         Texture3D.cpp
+         Texture2D.cpp
+         Texture1D.cpp
+         Texture.cpp
+         Shader.cpp
+     1>c:\users\alex\documents\school\coms 336x\project\trunk\renderutils\shader.cpp(416): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
+         ObjFile.cpp
+     1>c:\users\alex\documents\school\coms 336x\project\trunk\renderutils\objfile.cpp(27): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
+     1>c:\users\alex\documents\school\coms 336x\project\trunk\renderutils\objfile.cpp(39): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
+     1>c:\users\alex\documents\school\coms 336x\project\trunk\renderutils\objfile.cpp(54): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
+         Noise.cpp
+         FrameBuffer.cpp
+         DepthTexture2D.cpp
+         Camera.cpp
+     1>c:\users\alex\documents\school\coms 336x\project\trunk\renderutils\camera.cpp(38): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         Generating Code...
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\include /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt perlin.c
+         perlin.c
        Lib:
-         All outputs are up-to-date.
-         RenderUtils.vcxproj -> C:\Users\mjsenter\Documents\GitHub\rubiks\Debug\RenderUtils.lib
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\RenderUtils.lib" /LIBPATH:..\lib\windows /NOLOGO Debug\Camera.obj
+         Debug\DepthTexture2D.obj
+         Debug\FrameBuffer.obj
+         Debug\Noise.obj
+         Debug\ObjFile.obj
+         Debug\perlin.obj
+         Debug\Shader.obj
+         Debug\stb_image.obj
+         Debug\Texture.obj
+         Debug\Texture1D.obj
+         Debug\Texture2D.obj
+         Debug\Texture3D.obj
+         Debug\TextureCube.obj
+         Debug\VertexArray.obj
+         RenderUtils.vcxproj -> C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\RenderUtils.lib
        FinalizeBuildStatus:
          Deleting file "Debug\RenderUtils.unsuccessfulbuild".
          Touching "Debug\RenderUtils.lastbuildstate".
-     1>Done Building Project "C:\Users\mjsenter\Documents\GitHub\rubiks\RenderUtils\RenderUtils.vcxproj" (build target(s)).
+     1>Done Building Project "C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\RenderUtils\RenderUtils.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.03
+Time Elapsed 00:00:15.33

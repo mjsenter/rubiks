@@ -292,7 +292,56 @@ void rubiksCube::rotateCube( int dir ) {
 }
 void rubiksCube::reset() {}
 void rubiksCube::scramble() {}
-bool rubiksCube::isWin() {return false;}
+bool rubiksCube::isWin() {
+
+	//checks front face
+	for(int i = 1; i<dim*dim; i++){
+		if(front->colors[i].x != front->colors[i - 1].x
+			|| front->colors[i].y != front->colors[i - 1].y
+			|| front->colors[i].z != front->colors[i - 1].z
+			|| front->colors[i].w != front->colors[i - 1].w){
+				return false;
+		}
+	}
+	//checks right face
+	for(int i = 1; i<dim*dim; i++){
+		if(front->right->colors[i].x != front->right->colors[i - 1].x
+			|| front->right->colors[i].y != front->right->colors[i - 1].y
+			|| front->right->colors[i].z != front->right->colors[i - 1].z
+			|| front->right->colors[i].w != front->right->colors[i - 1].w){
+				return false;
+		}
+	}
+	//checks top face
+	for(int i = 1; i<dim*dim; i++){
+		if(front->top->colors[i].x != front->top->colors[i - 1].x
+			|| front->top->colors[i].y != front->top->colors[i - 1].y
+			|| front->top->colors[i].z != front->top->colors[i - 1].z
+			|| front->top->colors[i].w != front->top->colors[i - 1].w){
+				return false;
+		}
+	}
+	//checks left face
+	for(int i = 1; i<dim*dim; i++){
+		if(front->left->colors[i].x != front->left->colors[i - 1].x
+			|| front->left->colors[i].y != front->left->colors[i - 1].y
+			|| front->left->colors[i].z != front->left->colors[i - 1].z
+			|| front->left->colors[i].w != front->left->colors[i - 1].w){
+				return false;
+		}
+	}
+	//checks back face
+	for(int i = 1; i<dim*dim; i++){
+		if(front->back->colors[i].x != front->back->colors[i - 1].x
+			|| front->back->colors[i].y != front->back->colors[i - 1].y
+			|| front->back->colors[i].z != front->back->colors[i - 1].z
+			|| front->back->colors[i].w != front->back->colors[i - 1].w){
+				return false;
+		}
+	}
+	std::cout<<"Win!"<<std::endl;
+	return true;
+}
 
 bool rubiksCube::moveCursorRight() {
 	if( cursor % dim != dim - 1 ) {
