@@ -12,7 +12,7 @@ void init( int dimensions ) {
 	camera->LookDown( 25 );
 	camera->MoveForward( 1.5 );
 		
-	cube = new rubiksCube(3);
+	cube = new rubiksCube( dimensions );
 
 	glEnable( GL_DEPTH_TEST );
 	glClearColor( .25, .25, 1.0, 1.0 );
@@ -62,34 +62,34 @@ void keyboard( unsigned char key, int x, int y ) {
 			case 'T':
 				cube->rotate(3, false, false);
 				break;
+
+			//Reset cube
+			case 'z':
+			case 'Z':
+				int dim = cube->getDimensions();
+				delete cube;
+				cube = new rubiksCube( dim );
+				break;
 			
 	}
 	glutPostRedisplay();
 }
 
 void keyboardSpecial( int key, int x, int y ) {
-		switch( key ) {
-			case GLUT_KEY_UP:
-				if( cube->cursor >= cube->dim ) {
-					cube->cursor -= cube->dim;
-				}
-				break;
-			case GLUT_KEY_DOWN:
-				if( cube->cursor + cube->dim < cube->dim * cube->dim ) {
-					cube->cursor += cube->dim;
-				}
-				break;
-			case GLUT_KEY_RIGHT:
-				if( cube->cursor % cube->dim != cube->dim - 1 ) {
-					cube->cursor++;
-				}
-				break;
-			case GLUT_KEY_LEFT:
-				if( cube->cursor % cube->dim != 0 ) {
-					cube->cursor--;
-				}
-				break;
-		}
+	switch( key ) {
+		case GLUT_KEY_UP:
+			cube->moveCursorUp();
+			break;
+		case GLUT_KEY_DOWN:
+			cube->moveCursorDown();
+			break;
+		case GLUT_KEY_RIGHT:
+			cube->moveCursorRight();
+			break;
+		case GLUT_KEY_LEFT:
+			cube->moveCursorLeft();
+			break;
+	}
 	glutPostRedisplay();
 }
 
@@ -104,7 +104,7 @@ int main( int argc, char **argv )
 
 	glewInit();
 
-	init( 3 );
+	init( 4 );
 
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);

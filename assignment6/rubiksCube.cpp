@@ -9,7 +9,7 @@ rubiksCube::rubiksCube( int dimensions ) {
 	colors[2] = vec4( 0.7, 0.7, 0.7, 1.0 );
 	colors[3] = vec4( 0.85, 0.85, 0.0, 1.0 );
 	colors[4] = vec4( 0.85, 0.0, 0.0, 1.0 );
-	colors[5] = vec4( 0.85, 0.35, 0.0, 1.0 );
+	colors[5] = vec4( 0.85, 0.40, 0.0, 1.0 );
 
 	dim = dimensions;
 	cursor = 0;
@@ -74,11 +74,28 @@ rubiksCube::rubiksCube( int dimensions ) {
 }
 
 rubiksCube::Side::Side( int dim, vec4 color ) {
-	homeColor = color;
-	colors = (vec4 *)malloc( sizeof( vec4 ) * dim * dim );
-	for( int i = 0; i < dim * dim; i++ ) {
+	//homeColor = color;
+	numColors = dim * dim;
+	colors = (vec4 *)malloc( sizeof( vec4 ) * numColors );
+	for( int i = 0; i < numColors; i++ ) {
 		colors[i] = color;
 	}
+}
+
+rubiksCube::~rubiksCube() {
+	delete front->back;
+	delete front->bottom;
+	delete front->top;
+	delete front->right;
+	delete front->left;
+	delete front;
+	free( colors );
+}
+
+//Side deletion only responsible for itself
+//Does not delete links to other sides
+rubiksCube::Side::~Side() {
+	free( colors );
 }
 
 void rubiksCube::displayCube( const mat4 & view, const mat4 & proj ) {
@@ -93,6 +110,7 @@ void rubiksCube::displayCube( const mat4 & view, const mat4 & proj ) {
 	baseCube->Unbind();
 	baseShader->Unbind();
 
+	//Draw faces
 	faceShader->Bind();
 	face->Bind( *faceShader );
 	drawFace( view, proj, 0, front, true );
@@ -252,50 +270,62 @@ void rubiksCube::rotateCube( int dir ) {
 	Side * tempFront = front;
 	
 	if(dir == 0){
-		for(int i = 0; i< dim; i++){
+		for(int i = 0; i < dim; i++){
 			rotate(i*dim, 0, 1);
 		}
-		/*
-		front = front->left;
-		front.left = front.back;
-		front.back = front.right;
-		front.right = tempfront;
-		*/
 	}
 	if(dir == 1){
-		for(int i = 0; i< dim; i++){
+		for(int i = 0; i < dim; i++){
 			rotate(i*dim, 0, 0);
 		}
-		/*
-		front = front.right;
-		front.right = front.back;
-		front.back = front.left;
-		front.left = tempFront;
-		*/
 	}
 	if(dir == 2){
-		for(int i = 0; i< dim; i++){
-			rotate(i, 1, 1);
-		}
-		/*
-		front = front.bottom;
-		front.bottom = front.back;
-		front.back = front.top;
-		front.top = tempFront;
-		*/
-	}
-	if(dir == 3){
-		for(int i = 0; i< dim; i++){
+		for(int i = 0; i < dim; i++){
 			rotate(i, 1, 0);
 		}
-		/*
-		front = front.top;
-		front.top = front.back;
-		front.back = front.bottom;
-		front.bottom = tempFront;
-		*/
+	}
+	if(dir == 3){
+		for(int i = 0; i < dim; i++){
+			rotate(i, 1, 1);
+		}
 	}
 }
 void rubiksCube::reset() {}
 void rubiksCube::scramble() {}
 bool rubiksCube::isWin() {return false;}
+
+bool rubiksCube::moveCursorRight() {
+	if( cursor % dim != dim - 1 ) {
+		cursor++;
+		return true;
+	}
+	return false;
+}
+bool rubiksCube::moveCursorLeft() {
+	if( cursor % dim != 0 ) {
+		cursor--;
+		return true;
+	}
+	return false;
+}
+bool rubiksCube::moveCursorUp() {
+	if( cursor >= dim ) {
+		cursor -= dim;
+		return true;
+	}
+	return false;
+}
+bool rubiksCube::moveCursorDown() {
+	if( cursor + dim < dim * dim ) {
+		cursor += dim;
+		return true;
+	}
+	return false;
+}
+
+int rubiksCube::getDimensions() {
+	return dim;
+}
+int rubiksCube::getCursor() {
+	return cursor;
+}
