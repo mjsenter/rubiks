@@ -75,8 +75,10 @@
   <ItemGroup>
     <None Include="ffaceShader.glsl" />
     <None Include="fshader.glsl" />
+    <None Include="fshader_cube_tex.glsl" />
     <None Include="vfaceShader.glsl" />
     <None Include="vshader.glsl" />
+    <None Include="vshader_cube_tex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rubiksCube.h" />

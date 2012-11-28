@@ -14,6 +14,8 @@ rubiksCube::rubiksCube( int dimensions ) {
 	dim = dimensions;
 	cursor = 0;
 
+	isScrambled = false;
+
 	//Front face setup
 	front = new Side( dimensions, colors[0] );
 	front->back = new Side( dimensions, colors[1] );
@@ -160,17 +162,15 @@ void rubiksCube::drawFace( mat4 view, mat4 proj, int rot, Side * side, bool draw
 	}
 }
 
-void rubiksCube::rotate(int index,bool v, bool d) {
+void rubiksCube::rotate(bool v, bool d) {
 	int column;
 	int row;
 	Side *tempFront = new Side(dim, vec4(0, 0, 0, 1));
 	for(int i = 0; i< dim*dim; i++){
 		tempFront->colors[i] = front->colors[i];
 	}
-	column = index % dim;
-	row = index / dim;
-	std::cout<<"Column: "<<column<<std::endl;
-	std::cout<<"Row: "<<row<<std::endl;
+	column = cursor % dim;
+	row = cursor / dim;
 	
 	//Vertical
 	if(v){
@@ -268,31 +268,39 @@ void rubiksCube::rotate(int index,bool v, bool d) {
 
 void rubiksCube::rotateCube( int dir ) {
 	Side * tempFront = front;
-	
+	int tempCursor = cursor;
 	if(dir == 0){
 		for(int i = 0; i < dim; i++){
-			rotate(i*dim, 0, 1);
+			cursor = i*dim;
+			rotate(0, 1);
 		}
 	}
 	if(dir == 1){
 		for(int i = 0; i < dim; i++){
-			rotate(i*dim, 0, 0);
+			cursor = i*dim;
+			rotate( 0, 0);
 		}
 	}
 	if(dir == 2){
 		for(int i = 0; i < dim; i++){
-			rotate(i, 1, 0);
+			cursor = i;
+			rotate(1, 0);
 		}
 	}
 	if(dir == 3){
 		for(int i = 0; i < dim; i++){
-			rotate(i, 1, 1);
+			cursor = i;
+			rotate(1, 1);
 		}
 	}
+	cursor = tempCursor;
 }
 void rubiksCube::reset() {}
 void rubiksCube::scramble() {}
 bool rubiksCube::isWin() {
+	if( !isScrambled ) {
+		return false;
+	}
 
 	//checks front face
 	for(int i = 1; i<dim*dim; i++){

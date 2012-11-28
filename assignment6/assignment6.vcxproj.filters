@@ -38,6 +38,12 @@
     <None Include="vfaceShader.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="fshader_cube_tex.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vshader_cube_tex.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rubiksCube.h">

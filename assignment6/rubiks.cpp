@@ -1,25 +1,57 @@
 #include "rubiksCube.h"
 #include "Camera.h" 
+#include "TextureCube.h"
 
 
 Camera * camera = new Camera( vec3( 0.9, 0.9, 2.0 ) );
 
 rubiksCube * cube;
 
+VertexArray * skybox;
+Shader * skyShader;
+TextureCube * skyboxTexture;
+mat4 skyModel;
+
 
 void init( int dimensions ) {
 	camera->LookLeft( 25 );
 	camera->LookDown( 25 );
 	camera->MoveForward( 1.5 );
+
+	/* Skybox Initialization */
+	skyboxTexture = new TextureCube(
+	"../images/pos_x.tga",
+	"../images/neg_x.tga",
+	"../images/pos_y.tga",
+	"../images/neg_y.tga",
+	"../images/pos_z.tga",
+	"../images/neg_z.tga");
+	Cube sky;
+	skybox = new VertexArray();
+	skybox->AddAttribute( "vPosition", sky.getVertices(), sky.getNumVertices() );
+	skyModel = Scale( 5.0 );
+	skyShader= new Shader( "vshader_cube_tex.glsl", "fshader_cube_tex.glsl" );
 		
 	cube = new rubiksCube( dimensions );
 
 	glEnable( GL_DEPTH_TEST );
-	glClearColor( .25, .25, 1.0, 1.0 );
+	glClearColor( 1.0, 1.0, 1.0, 1.0 );
 }
 
 void display() {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+	/* Skybox processing */
+	skyboxTexture->Bind( 1 );
+	skyShader->Bind();
+	skyShader->SetUniform( "model", skyModel );
+	skyShader->SetUniform( "view", camera->GetView() );
+	skyShader->SetUniform( "projection", camera->GetProjection() );
+	skyShader->SetUniform( "textureCube", skyboxTexture->GetTextureUnit() );
+	skybox->Bind( *skyShader );
+	skybox->Draw( GL_TRIANGLES );
+	skybox->Unbind();
+	skyShader->Unbind();
 
 	cube->displayCube( camera->GetView(), camera->GetProjection() );
 
@@ -36,34 +68,34 @@ void keyboard( unsigned char key, int x, int y ) {
 			case 'Q':
 				exit( EXIT_SUCCESS );
 				break; 
-			case 'w':
+			case 'W':
 				cube->rotateCube( 2 );
 				break;
-			case 'a':
+			case 'A':
 				cube->rotateCube( 0 );
 				break;
-			case 'd':  
+			case 'D':  
 				cube->rotateCube( 1 );
 				break;
-			case 's':
+			case 'S':
 				cube->rotateCube( 3 );
 				break;
 
-			case 'r':
+			case 's':
 				//scramble();
-				cube->rotate(1, true, false);
+				cube->rotate(true, false);
 				cube->isWin();
 				break;
-			case 'R':
-				cube->rotate(1, true, true);
+			case 'w':
+				cube->rotate(true, true);
 				cube->isWin();
 				break;
-			case 't':
-				cube->rotate(3, false, true);
+			case 'd':
+				cube->rotate(false, true);
 				cube->isWin();
 				break;
-			case 'T':
-				cube->rotate(3, false, false);
+			case 'a':
+				cube->rotate(false, false);
 				cube->isWin();
 				break;
 

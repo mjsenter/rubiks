@@ -41,6 +41,8 @@ private:
 	int cursor;
 	int dim;
 
+	bool isScrambled;
+
 	void drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor );
 
 public:
@@ -51,9 +53,8 @@ public:
 	~rubiksCube();	
 
 	void displayCube( const mat4 & view, const mat4 & proj );
-	void rotate(int index,bool v, bool d);
+	void rotate(bool v, bool d);
 	void rotateCube( int dir );
-	void reset();
 	void scramble();
 	bool isWin();
 
