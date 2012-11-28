@@ -293,7 +293,20 @@ void rubiksCube::rotateCube( bool v, bool d ) {
 	anim->vert = v;
 }
 
-void rubiksCube::scramble() {}
+void rubiksCube::scramble() {
+	srand(time(NULL));
+	int tempCursor, vert, direction;
+	tempCursor = cursor;
+	for(int i = 0; i<50; i++){
+		cursor = rand() % 10;
+		vert = rand() % 2;
+		direction = rand() % 2;
+		sectionRotate(vert, direction);
+	}
+	cursor = tempCursor;
+}
+
+
 bool rubiksCube::isWin() {
 	if( !isScrambled ) {
 		return false;

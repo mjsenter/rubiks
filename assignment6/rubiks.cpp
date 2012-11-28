@@ -105,6 +105,10 @@ void keyboard( unsigned char key, int x, int y ) {
 			cube->isWin();
 			break;
 
+		//scramble
+		case 'y':
+			cube->scramble();
+			break;
 		//Reset cube
 		case 'z':
 		case 'Z':
@@ -158,7 +162,7 @@ int main( int argc, char **argv )
 
 	glewInit();
 
-	init( 4 );
+	init( 3 );
 
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
