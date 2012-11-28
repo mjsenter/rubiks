@@ -12,11 +12,19 @@ Shader * skyShader;
 TextureCube * skyboxTexture;
 mat4 skyModel;
 
+// elapsed time
+int elapsedTime;
+
+// frame rate in millis for 30 frames/sec
+const int frameRate = 1000.0 / 30;
+
 
 void init( int dimensions ) {
 	camera->LookLeft( 25 );
 	camera->LookDown( 25 );
 	camera->MoveForward( 1.5 );
+
+	elapsedTime = 0;
 
 	/* Skybox Initialization */
 	skyboxTexture = new TextureCube(
@@ -60,52 +68,50 @@ void display() {
 
 
 void keyboard( unsigned char key, int x, int y ) {
-	//if( !rotating ) { //Dont accept input while rotating
-		int temp;
-		switch( key ) {
-			case 033:
-			case 'q': 
-			case 'Q':
-				exit( EXIT_SUCCESS );
-				break; 
-			case 'W':
-				cube->rotateCube( 2 );
-				break;
-			case 'A':
-				cube->rotateCube( 0 );
-				break;
-			case 'D':  
-				cube->rotateCube( 1 );
-				break;
-			case 'S':
-				cube->rotateCube( 3 );
-				break;
+	int temp;
+	switch( key ) {
+		case 033:
+		case 'q': 
+		case 'Q':
+			exit( EXIT_SUCCESS );
+			break; 
+		case 'W':
+			cube->rotateCube( true, true );
+			break;
+		case 'A':
+			cube->rotateCube( false, false );
+			break;
+		case 'D':  
+			cube->rotateCube( false, true );
+			break;
+		case 'S':
+			cube->rotateCube( true, false );
+			break;
 
-			case 's':
-				//scramble();
-				cube->rotate(true, false);
-				cube->isWin();
-				break;
-			case 'w':
-				cube->rotate(true, true);
-				cube->isWin();
-				break;
-			case 'd':
-				cube->rotate(false, true);
-				cube->isWin();
-				break;
-			case 'a':
-				cube->rotate(false, false);
-				cube->isWin();
-				break;
+		case 's':
+			cube->rotate(true, false);
+			cube->isWin();
+			break;
+		case 'w':
+			cube->rotate(true, true);
+			cube->isWin();
+			break;
+		case 'd':
+			cube->rotate(false, true);
+			cube->isWin();
+			break;
+		case 'a':
+			cube->rotate(false, false);
+			cube->isWin();
+			break;
 
-			//Reset cube
-			case 'z':
-			case 'Z':
-				int dim = cube->getDimensions();
-				delete cube;
-				cube = new rubiksCube( dim );
-				break;
+		//Reset cube
+		case 'z':
+		case 'Z':
+			int dim = cube->getDimensions();
+			delete cube;
+			cube = new rubiksCube( dim );
+			break;
 			
 	}
 	glutPostRedisplay();
@@ -129,6 +135,18 @@ void keyboardSpecial( int key, int x, int y ) {
 	glutPostRedisplay();
 }
 
+void idle( void )
+{
+	int now = glutGet(GLUT_ELAPSED_TIME);
+	if (now - elapsedTime > frameRate)
+	{
+		elapsedTime = now;
+		cube->update();
+		glutPostRedisplay();
+	}
+}
+
+
 int main( int argc, char **argv )
 {
 	glutInit( &argc, argv );
@@ -145,7 +163,7 @@ int main( int argc, char **argv )
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(keyboardSpecial);
-	//glutIdleFunc( idle );
+	glutIdleFunc( idle );
 	glutMainLoop();
 	return 0;
 }
