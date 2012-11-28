@@ -20,6 +20,7 @@ private:
 			Side * left;
 			Side * top;
 			Side * bottom;
+			VertexArray * cube;
 	};
 	Side * front;
 
@@ -44,6 +45,7 @@ private:
 		int section;	//Which column/row
 		int count;		//Current frame in animation
 		int numFrames;	//Number of frames for animation
+		mat4 transform;
 	} Anim;
 	Anim * anim;
 
