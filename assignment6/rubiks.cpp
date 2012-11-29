@@ -75,6 +75,34 @@ void keyboard( unsigned char key, int x, int y ) {
 		case 'Q':
 			exit( EXIT_SUCCESS );
 			break; 
+
+		//Camera Controls
+		case 'i':   // forward
+			camera->MoveForward(0.5);
+			break;
+		case 'j':
+		camera->LookLeft(5);
+		break;
+	  case 'k':   
+		camera->MoveBackward(0.5);
+		break;
+	  case 'l':
+		camera->LookRight(5);
+		break;
+	  case 'p':
+		camera->MoveUp(0.5);
+		break;
+	  case ';':
+		camera->MoveDown(0.5);
+		break;
+	  case '9':
+		camera->LookUp(5);
+		break;
+	  case '8':
+		camera->LookDown(5);
+		break;
+
+
 		case 'W':
 			cube->rotateCube( true, true );
 			break;
@@ -116,6 +144,8 @@ void keyboard( unsigned char key, int x, int y ) {
 			delete cube;
 			cube = new rubiksCube( dim );
 			break;
+
+
 			
 	}
 	glutPostRedisplay();
