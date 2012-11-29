@@ -12,17 +12,17 @@ private:
 		public:
 			Side( int dim, vec4 color );
 			~Side();
-			//vec4 homeColor;
-			vec4 * colors;
-			int numColors;
+			vec4 * colors; //Array of colors on the side
+			bool * rotate; //Rotate face?
+			int numColors; //Number of faces per side
 			Side * back;
 			Side * right;
 			Side * left;
 			Side * top;
 			Side * bottom;
-			VertexArray * cube;
 	};
 	Side * front;
+	Side * nextFront;
 
 	/* Colors:
 	 * 0: Front - Green
@@ -41,7 +41,6 @@ private:
 		bool rotate;	//Cube is rotating?
 		bool vert;		//Vertical = true;  Horizontal = false;
 		bool dir;		//Right and Up = true;  Left and Down = false;
-		bool cubeRot;	//Rotate entire cube?
 		int section;	//Which column/row
 		int count;		//Current frame in animation
 		int numFrames;	//Number of frames for animation
@@ -62,7 +61,8 @@ private:
 	void drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor );
 
 	void sectionRotate( bool v, bool d );
-	void cubeRotate( bool v, bool d );
+
+	Side * createSides( int dimensions );
 
 public:
 	rubiksCube(){
