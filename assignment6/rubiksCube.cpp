@@ -451,9 +451,6 @@ void rubiksCube::scramble() {
 }
 
 bool rubiksCube::isWin() {
-	if(anim->rotate){
-		return false;
-	}
 	if( !isScrambled ) {
 		return false;
 	}
