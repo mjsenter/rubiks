@@ -55,6 +55,7 @@ private:
 
 	int cursor;
 	int dim;
+	int random;
 
 	bool isScrambled;
 

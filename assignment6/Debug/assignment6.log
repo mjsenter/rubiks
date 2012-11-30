@@ -1,34 +1,12 @@
-﻿Build started 11/29/2012 4:52:11 PM.
+﻿Build started 11/30/2012 9:47:07 AM.
      1>Project "C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\assignment6\assignment6.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\assignment6.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\include /I..\RenderUtils /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt rubiksCube.cpp
-         rubiksCube.cpp
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(7): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(8): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(9): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(9): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(9): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(10): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(10): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(11): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(12): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(12): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(129): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(160): warning C4305: 'argument' : truncation from 'double' to 'const GLfloat'
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(434): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(441): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
-     1>c:\users\alex\documents\school\coms 336x\project\trunk\assignment6\rubikscube.cpp(441): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+         All outputs are up-to-date.
        Link:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\assignment6.exe" /NOLOGO /LIBPATH:..\lib\windows glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\assignment6.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\assignment6.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\assignment6.lib" /MACHINE:X86 Debug\InitShader.obj
-         Debug\rubiks.obj
-         Debug\rubiksCube.obj
-         "C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\RenderUtils.lib"
-         LINK : C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\assignment6.exe not found or not built by the last incremental link; performing full link
+         All outputs are up-to-date.
          assignment6.vcxproj -> C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\assignment6.exe
-       Manifest:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\Debug\assignment6.exe;#1" /manifest Debug\assignment6.exe.intermediate.manifest
        FinalizeBuildStatus:
          Deleting file "Debug\assignment6.unsuccessfulbuild".
          Touching "Debug\assignment6.lastbuildstate".
@@ -36,4 +14,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.62
+Time Elapsed 00:00:00.08
