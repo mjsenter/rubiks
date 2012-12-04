@@ -192,7 +192,7 @@ int main( int argc, char **argv )
 
 	glewInit();
 
-	init( 3 );
+	init( 2 );
 
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);

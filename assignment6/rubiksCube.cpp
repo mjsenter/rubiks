@@ -440,12 +440,19 @@ void rubiksCube::scramble() {
 	if(anim->rotate){
 		return;
 	}
+	
 	int tempCursor, vert, direction;
 	tempCursor = cursor;
+
+	if((dim == 2) && (isScrambled == false)){
+		cursor = 0;
+	}
+	else{
 		cursor = random % dim*dim + 1;
-		vert = random % 2;
-		direction = random % 2;
-		rotate(vert, direction);
+	}
+	vert = random % 2;
+	direction = random % 2;
+	rotate(vert, direction);
 	cursor = tempCursor;
 	isScrambled = true;
 }

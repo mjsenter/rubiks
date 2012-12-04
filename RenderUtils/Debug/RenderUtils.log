@@ -1,4 +1,4 @@
-﻿Build started 11/30/2012 11:27:13 AM.
+﻿Build started 12/4/2012 11:49:22 AM.
      1>Project "C:\Users\Alex\Documents\School\ComS 336X\Project\trunk\RenderUtils\RenderUtils.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\RenderUtils.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -15,4 +15,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.07
+Time Elapsed 00:00:00.13
