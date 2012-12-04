@@ -4,6 +4,9 @@
 rubiksCube::rubiksCube( int dimensions ) {
 	srand(time(NULL));
 
+	cursorHighlight = 0;
+	inc = 0.1;
+
 	colors = (vec4 *)malloc( sizeof( vec4 ) * 6 );
 	colors[0] = vec4( 0, 0.85, 0, 0 );
 	colors[1] = vec4( 0.0, 0.0, 0.85, 1.0 );
@@ -127,6 +130,7 @@ void rubiksCube::displayCube( const mat4 & view, const mat4 & proj ) {
 }
 
 void rubiksCube::drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor ) {
+	vec4 cur( cursorHighlight, cursorHighlight, cursorHighlight, 1.0 );
 	mat4 colorScale = Scale( 1 / (GLfloat)dim * 0.9 );
 	mat4 cubeScale = Scale( 1 / (GLfloat)dim );
 	for( int i = 0; i < dim; i++ ) {
@@ -165,6 +169,7 @@ void rubiksCube::drawFace( mat4 view, mat4 proj, int rot, Side * side, bool draw
 			faceShader->SetUniform( "color", side->colors[i*dim + j] );
 			faceShader->SetUniform( "model", rotModel * model );
 			faceShader->SetUniform( "cursor", (cursor == i*dim + j) && drawCursor);
+			faceShader->SetUniform( "highlight", cur );
 			faceShader->SetUniform( "view", view );
 			faceShader->SetUniform( "projection", proj );
 			face->Draw( GL_TRIANGLE_FAN );
@@ -551,6 +556,11 @@ int rubiksCube::getCursor() {
 }
 
 void rubiksCube::update() {
+	cursorHighlight += inc;
+	if( cursorHighlight >= 1.0  || cursorHighlight <= 0.0 ) {
+		inc *= -1;
+	}
+
 	if( !anim->rotate ) {
 		return;
 	}

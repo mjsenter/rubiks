@@ -59,6 +59,9 @@ private:
 
 	bool isScrambled;
 
+	float cursorHighlight;
+	float inc;
+
 	void drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor );
 
 	void sectionRotate( bool v, bool d );
