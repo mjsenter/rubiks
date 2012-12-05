@@ -50,16 +50,16 @@ void display() {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	/* Skybox processing */
-	skyboxTexture->Bind( 1 );
-	skyShader->Bind();
-	skyShader->SetUniform( "model", skyModel );
-	skyShader->SetUniform( "view", camera->GetView() );
-	skyShader->SetUniform( "projection", camera->GetProjection() );
-	skyShader->SetUniform( "textureCube", skyboxTexture->GetTextureUnit() );
-	skybox->Bind( *skyShader );
-	skybox->Draw( GL_TRIANGLES );
-	skybox->Unbind();
-	skyShader->Unbind();
+	//skyboxTexture->Bind( 1 );
+	//skyShader->Bind();
+	//skyShader->SetUniform( "model", skyModel );
+	//skyShader->SetUniform( "view", camera->GetView() );
+	//skyShader->SetUniform( "projection", camera->GetProjection() );
+	//skyShader->SetUniform( "textureCube", skyboxTexture->GetTextureUnit() );
+	//skybox->Bind( *skyShader );
+	//skybox->Draw( GL_TRIANGLES );
+	//skybox->Unbind();
+	//skyShader->Unbind();
 
 	cube->displayCube( camera->GetView(), camera->GetProjection() );
 
@@ -192,7 +192,7 @@ int main( int argc, char **argv )
 
 	glewInit();
 
-	init( 2 );
+	init( 3 );
 
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);

@@ -130,12 +130,11 @@ void rubiksCube::displayCube( const mat4 & view, const mat4 & proj ) {
 }
 
 void rubiksCube::drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor ) {
-	if( cursorHighlight < 0.0 ) {
-		std::cout << "FUCK" << std::endl;
-	}
 	vec4 cur( cursorHighlight, cursorHighlight, cursorHighlight, 1.0 );
 	mat4 colorScale = Scale( 1 / (GLfloat)dim * 0.9 );
 	mat4 cubeScale = Scale( 1 / (GLfloat)dim );
+	vec4 v( view[2].x, view[2].y, view[2].z, 0.0 );
+	vec4 faceNorm( 0.0, 0.0, 1.0, 0.0 );
 	for( int i = 0; i < dim; i++ ) {
 		for( int j = 0; j < dim; j++ ) {
 			mat4 rotModel;
@@ -161,38 +160,39 @@ void rubiksCube::drawFace( mat4 view, mat4 proj, int rot, Side * side, bool draw
 					rotModel = anim->transform * rotModel;
 				}
 			}
-
-			mat4 model = Translate( (GLfloat)1/(2*dim) + 
-					(GLfloat)j/dim, -(GLfloat)1/(2*dim) - 
-					(GLfloat)i/dim, 0.0 ) * 
-				Translate( -0.5, 0.5, 0.51 ) * 
-				colorScale;
-			faceShader->Bind();
-			face->Bind( *faceShader );
-			faceShader->SetUniform( "color", side->colors[i*dim + j] );
-			faceShader->SetUniform( "model", rotModel * model );
-			faceShader->SetUniform( "cursor", (cursor == i*dim + j) && drawCursor);
-			faceShader->SetUniform( "highlight", cur );
-			faceShader->SetUniform( "view", view );
-			faceShader->SetUniform( "projection", proj );
-			face->Draw( GL_TRIANGLE_FAN );
-			face->Unbind();
-			faceShader->Unbind();
-
-			model = Translate( (GLfloat)1/(2*dim) + 
+			if( dot( v, rotModel * faceNorm ) >= 0 ) {
+				mat4 model = Translate( (GLfloat)1/(2*dim) + 
 						(GLfloat)j/dim, -(GLfloat)1/(2*dim) - 
-						(GLfloat)i/dim, -(GLfloat)1/(2*dim) ) * 
-					Translate( -0.5, 0.5, 0.5 ) * 
-					cubeScale;
-			baseShader->Bind();
-			baseShader->SetUniform( "view", view );
-			baseShader->SetUniform( "model", rotModel * model );
-			baseShader->SetUniform( "projection", proj );
-			baseShader->SetUniform( "color", vec4( 0.0, 0.0, 0.0, 1.0 ) );
-			baseCube->Bind( *baseShader );
-			baseCube->Draw( GL_TRIANGLES );
-			baseCube->Unbind();
-			baseShader->Unbind();
+						(GLfloat)i/dim, 0.0 ) * 
+					Translate( -0.5, 0.5, 0.51 ) * 
+					colorScale;
+				faceShader->Bind();
+				face->Bind( *faceShader );
+				faceShader->SetUniform( "color", side->colors[i*dim + j] );
+				faceShader->SetUniform( "model", rotModel * model );
+				faceShader->SetUniform( "cursor", (cursor == i*dim + j) && drawCursor);
+				faceShader->SetUniform( "highlight", cur );
+				faceShader->SetUniform( "view", view );
+				faceShader->SetUniform( "projection", proj );
+				face->Draw( GL_TRIANGLE_FAN );
+				face->Unbind();
+				faceShader->Unbind();
+
+				model = Translate( (GLfloat)1/(2*dim) + 
+							(GLfloat)j/dim, -(GLfloat)1/(2*dim) - 
+							(GLfloat)i/dim, -(GLfloat)1/(2*dim) ) * 
+						Translate( -0.5, 0.5, 0.5 ) * 
+						cubeScale;
+				baseShader->Bind();
+				baseShader->SetUniform( "view", view );
+				baseShader->SetUniform( "model", rotModel * model );
+				baseShader->SetUniform( "projection", proj );
+				baseShader->SetUniform( "color", vec4( 0.0, 0.0, 0.0, 1.0 ) );
+				baseCube->Bind( *baseShader );
+				baseCube->Draw( GL_TRIANGLES );
+				baseCube->Unbind();
+				baseShader->Unbind();
+			}
 		}
 	}
 }
