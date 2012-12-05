@@ -55,7 +55,7 @@ private:
 
 	int cursor;
 	int dim;
-	int random;
+	unsigned int random;
 
 	bool isScrambled;
 
@@ -63,8 +63,6 @@ private:
 	float inc;
 
 	void drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor );
-
-	void sectionRotate( bool v, bool d );
 
 	Side * createSides( int dimensions );
 
