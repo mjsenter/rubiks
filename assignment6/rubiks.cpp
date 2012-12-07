@@ -102,32 +102,40 @@ void keyboard( unsigned char key, int x, int y ) {
 		camera->LookDown(5);
 		break;
 
-
+	/*Cube Controls*/
+		/*Rotate Up*/
 		case 'W':
 			cube->rotateCube( true, true );
 			break;
+		/*Rotate left*/
 		case 'A':
 			cube->rotateCube( false, false );
 			break;
+		/*Rotate down*/
 		case 'D':  
 			cube->rotateCube( false, true );
 			break;
+		/*Rotate right*/
 		case 'S':
 			cube->rotateCube( true, false );
 			break;
 
+		/*Turn row down*/
 		case 's':
 			cube->rotate(true, false);
 			cube->isWin();
 			break;
+		/*turn row up*/
 		case 'w':
 			cube->rotate(true, true);
 			cube->isWin();
 			break;
+		/*turn row right*/
 		case 'd':
 			cube->rotate(false, true);
 			cube->isWin();
 			break;
+		/*turn row left*/
 		case 'a':
 			cube->rotate(false, false);
 			cube->isWin();
@@ -153,15 +161,19 @@ void keyboard( unsigned char key, int x, int y ) {
 
 void keyboardSpecial( int key, int x, int y ) {
 	switch( key ) {
+		/*Move cursor up*/
 		case GLUT_KEY_UP:
 			cube->moveCursorUp();
 			break;
+			/*Move cursor down*/
 		case GLUT_KEY_DOWN:
 			cube->moveCursorDown();
 			break;
+		/*Move cursor right*/
 		case GLUT_KEY_RIGHT:
 			cube->moveCursorRight();
 			break;
+		/*Move cursor left*/
 		case GLUT_KEY_LEFT:
 			cube->moveCursorLeft();
 			break;
@@ -192,6 +204,7 @@ int main( int argc, char **argv )
 
 	glewInit();
 
+	/*Where to input the dimensions of the cube*/
 	init( 3 );
 
 	glutDisplayFunc(display);
