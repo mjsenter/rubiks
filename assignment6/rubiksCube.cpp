@@ -2,11 +2,12 @@
 
 
 rubiksCube::rubiksCube( int dimensions ) {
-	srand(time(NULL));
-
+	//Initialize cursor
 	cursorHighlight = 0.2;
 	inc = 0.05;
+	cursor = 0;
 
+	//Set up color scheme
 	colors = (vec4 *)malloc( sizeof( vec4 ) * 6 );
 	colors[0] = vec4( 0, 0.85, 0, 0 );
 	colors[1] = vec4( 0.0, 0.0, 0.85, 1.0 );
@@ -15,6 +16,7 @@ rubiksCube::rubiksCube( int dimensions ) {
 	colors[4] = vec4( 0.85, 0.0, 0.0, 1.0 );
 	colors[5] = vec4( 0.85, 0.40, 0.0, 1.0 );
 
+	//Initialize animation data
 	anim = (Anim *)malloc( sizeof( Anim ) );
 	anim->rotate = false;
 	anim->count = 0;
@@ -22,13 +24,14 @@ rubiksCube::rubiksCube( int dimensions ) {
 	anim->transform = Scale( 1.0 );
 
 	dim = dimensions;
-	cursor = 0;
 
 	isScrambled = false;
 
+	//Sides of cube creation
 	front = createSides( dimensions );
 	nextFront = createSides( dimensions );
 
+	//VAO creation
 	Cube cube;
 	baseCube = new VertexArray();
 	baseCube->AddAttribute( "vPosition", cube.getVertices(), cube.getNumVertices() );
@@ -42,7 +45,6 @@ rubiksCube::rubiksCube( int dimensions ) {
 		vec3(  0.5, -0.5,  0.0) };
 	face->AddAttribute( "vPosition", facePoints, 4 );
 	faceShader = new Shader( "vfaceShader.glsl", "ffaceShader.glsl" );
-
 }
 
 rubiksCube::Side * rubiksCube::createSides( int dimensions ) {
@@ -131,36 +133,47 @@ void rubiksCube::displayCube( const mat4 & view, const mat4 & proj ) {
 
 void rubiksCube::drawFace( mat4 view, mat4 proj, int rot, Side * side, bool drawCursor ) {
 	vec4 cur( cursorHighlight, cursorHighlight, cursorHighlight, 1.0 );
-	mat4 colorScale = Scale( 1 / (GLfloat)dim * 0.9 );
-	mat4 cubeScale = Scale( 1 / (GLfloat)dim );
-	vec4 v( view[2].x, view[2].y, view[2].z, 0.0 );
-	vec4 faceNorm( 0.0, 0.0, 1.0, 0.0 );
+	mat4 colorScale = Scale( 1 / (GLfloat)dim * 0.9 );	//Make faces slightly smaller than base cubes
+	mat4 cubeScale = Scale( 1 / (GLfloat)dim );	
+	vec4 v( view[2].x, view[2].y, view[2].z, 0.0 );	//Used for finding dot product of each face.
+	vec4 faceNorm( 0.0, 0.0, 1.0, 0.0 );	//Normal for the faces.
+
+	//Calculate rotation for drawing each side
+	mat4 rotation;
+	switch( rot ) {
+		case 1:
+			rotation = RotateY( 180 );
+			break;
+		case 2:
+			rotation = RotateX( -90 );
+			break;
+		case 3:
+			rotation = RotateX( 90 );
+			break;
+		case 4:
+			rotation = RotateY( 90 );
+			break;
+		case 5:
+			rotation = RotateY( -90 );
+			break;
+	}
+
+	//Draw each block
 	for( int i = 0; i < dim; i++ ) {
 		for( int j = 0; j < dim; j++ ) {
-			mat4 rotModel;
-			switch( rot ) {
-				case 1:
-					rotModel = RotateY( 180 );
-					break;
-				case 2:
-					rotModel = RotateX( -90 );
-					break;
-				case 3:
-					rotModel = RotateX( 90 );
-					break;
-				case 4:
-					rotModel = RotateY( 90 );
-					break;
-				case 5:
-					rotModel = RotateY( -90 );
-					break;
-			}
+			mat4 rotModel = rotation;
 			if( anim->rotate ) {
-				if( side->rotate[i*dim + j] ) {
-					rotModel = anim->transform * rotModel;
+				//If block is involved in current animation
+				if( side->rotate[i*dim + j] ) { 
+					rotModel = anim->transform * rotation;
 				}
 			}
+
+			//Only draw block if facing towards camera.
+			//Becomes noticeable around 6x6 cubes during animations
 			if( dot( v, rotModel * faceNorm ) >= 0 ) {
+
+				//Draw colored face
 				mat4 model = Translate( (GLfloat)1/(2*dim) + 
 						(GLfloat)j/dim, -(GLfloat)1/(2*dim) - 
 						(GLfloat)i/dim, 0.0 ) * 
@@ -178,6 +191,7 @@ void rubiksCube::drawFace( mat4 view, mat4 proj, int rot, Side * side, bool draw
 				face->Unbind();
 				faceShader->Unbind();
 
+				//Draw black base cube
 				model = Translate( (GLfloat)1/(2*dim) + 
 							(GLfloat)j/dim, -(GLfloat)1/(2*dim) - 
 							(GLfloat)i/dim, -(GLfloat)1/(2*dim) ) * 
@@ -229,13 +243,11 @@ void rubiksCube::rotate(bool v, bool d) {
 				front->bottom->rotate[column +i*dim] = true;
 			}
 
-
 			if(column == 0){
 				Side *tempLeft = new Side(dim, vec4(0, 0, 0, 1));
-					for(int i = 0; i< dim*dim; i++){
-						tempLeft->colors[i] = front->left->colors[i];
-					}
-
+				for(int i = 0; i< dim*dim; i++){
+					tempLeft->colors[i] = front->left->colors[i];
+				}
 				for( int i = 0; i < dim; i++ ) {
 					for( int j = 0; j < dim; j++ ) {
 						nextFront->left->colors[i*dim + j] = tempLeft->colors[dim - i - 1 + j * dim];
@@ -244,11 +256,11 @@ void rubiksCube::rotate(bool v, bool d) {
 				}
 			}
 
-			else if(column == (dim -1)){
+			if(column == (dim -1)){
 				Side *tempRight = new Side(dim, vec4(0, 0, 0, 1));
-					for(int i = 0; i< dim*dim; i++){
-						tempRight->colors[i] = front->right->colors[i];
-					}
+				for(int i = 0; i< dim*dim; i++){
+					tempRight->colors[i] = front->right->colors[i];
+				}
 					
 				for( int i = 0; i < dim; i++ ) {
 					for( int j = 0; j < dim; j++ ) {
@@ -257,52 +269,51 @@ void rubiksCube::rotate(bool v, bool d) {
 					}
 				}
 			}
-			}
+		}
+	}
+
+	//rotate down
+	if(v && !d){
+		for(int i = 0; i < dim; i++){
+			nextFront->colors[column + i*dim] = front->top->colors[column + i*dim];
+			nextFront->top->colors[column + i*dim] = front->back->colors[(dim*dim - 1) - (column + i*dim)];
+			nextFront->back->colors[(dim*dim - 1) - (column + i*dim)] = front->bottom->colors[column + i*dim];
+			nextFront->bottom->colors[column + i*dim] = tempFront->colors[column + i*dim];
+
+			front->rotate[column + i*dim] = true;
+			front->top->rotate[column + i*dim] = true;
+			front->back->rotate[(dim*dim - 1) - (column + i*dim)] = true;
+			front->bottom->rotate[column + i*dim] = true;	
 		}
 
-		//rotate down
-		if(v && !d){
-			for(int i = 0; i < dim; i++){
-				nextFront->colors[column + i*dim] = front->top->colors[column + i*dim];
-				nextFront->top->colors[column + i*dim] = front->back->colors[(dim*dim - 1) - (column + i*dim)];
-				nextFront->back->colors[(dim*dim - 1) - (column + i*dim)] = front->bottom->colors[column + i*dim];
-				nextFront->bottom->colors[column + i*dim] = tempFront->colors[column + i*dim];
-
-				front->rotate[column + i*dim] = true;
-				front->top->rotate[column + i*dim] = true;
-				front->back->rotate[(dim*dim - 1) - (column + i*dim)] = true;
-				front->bottom->rotate[column + i*dim] = true;
-				
+		if(column == 0){
+		Side *tempRight = new Side(dim, vec4(0, 0, 0, 1));
+			for(int i = 0; i< dim*dim; i++){
+				tempRight->colors[i] = front->left->colors[i];
 			}
-
-			if(column == 0){
-			Side *tempRight = new Side(dim, vec4(0, 0, 0, 1));
-				for(int i = 0; i< dim*dim; i++){
-					tempRight->colors[i] = front->left->colors[i];
-				}
 					
-				for( int i = 0; i < dim; i++ ) {
-					for( int j = 0; j < dim; j++ ) {
-						nextFront->left->colors[i*dim + j] = tempRight->colors[i + dim * dim - dim * (j + 1 )];		
-						front->left->rotate[i*dim + j] = true;
-					}
-				}
-			}
-
-			else if(column == (dim - 1)){
-				Side *tempRight = new Side(dim, vec4(0, 0, 0, 1));
-					for(int i = 0; i< dim*dim; i++){
-						tempRight->colors[i] = front->right->colors[i];
-					}
-
-				for( int i = 0; i < dim; i++ ) {
-					for( int j = 0; j < dim; j++ ) {
-						nextFront->right->colors[i*dim + j] = tempRight->colors[dim - i - 1 + j * dim];
-						front->right->rotate[i*dim + j] = true;
-					}
+			for( int i = 0; i < dim; i++ ) {
+				for( int j = 0; j < dim; j++ ) {
+					nextFront->left->colors[i*dim + j] = tempRight->colors[i + dim * dim - dim * (j + 1 )];		
+					front->left->rotate[i*dim + j] = true;
 				}
 			}
 		}
+
+		if(column == (dim - 1)){
+			Side *tempRight = new Side(dim, vec4(0, 0, 0, 1));
+			for(int i = 0; i< dim*dim; i++){
+				tempRight->colors[i] = front->right->colors[i];
+			}
+
+			for( int i = 0; i < dim; i++ ) {
+				for( int j = 0; j < dim; j++ ) {
+					nextFront->right->colors[i*dim + j] = tempRight->colors[dim - i - 1 + j * dim];
+					front->right->rotate[i*dim + j] = true;
+				}
+			}
+		}
+	}
 	
 	//Horizontal
 	if(!v) {
@@ -317,15 +328,14 @@ void rubiksCube::rotate(bool v, bool d) {
 				front->rotate[row*dim + i] = true;
 				front->left->rotate[row*dim + i] = true;
 				front->back->rotate[row*dim + i] = true;
-				front->right->rotate[row*dim + i] = true;
-				
+				front->right->rotate[row*dim + i] = true;	
 			}
 			
 			if(row == 0){
 				Side *tempTop = new Side(dim, vec4(0, 0, 0, 1));
-					for(int i = 0; i< dim*dim; i++){
-						tempTop->colors[i] = front->top->colors[i];
-					}
+				for(int i = 0; i< dim*dim; i++){
+					tempTop->colors[i] = front->top->colors[i];
+				}
 
 				for( int i = 0; i < dim; i++ ) {
 					for( int j = 0; j < dim; j++ ) {
@@ -336,11 +346,11 @@ void rubiksCube::rotate(bool v, bool d) {
 				}
 			}
 
-			else if(row == (dim - 1)){
+			if(row == (dim - 1)){
 				Side *tempTop = new Side(dim, vec4(0, 0, 0, 1));
-					for(int i = 0; i< dim*dim; i++){
-						tempTop->colors[i] = front->bottom->colors[i];
-					}
+				for(int i = 0; i< dim*dim; i++){
+					tempTop->colors[i] = front->bottom->colors[i];
+				}
 
 				for( int i = 0; i < dim; i++ ) {
 					for( int j = 0; j < dim; j++ ) {
@@ -353,18 +363,12 @@ void rubiksCube::rotate(bool v, bool d) {
 
 		//rotate left
 		if(!v && !d){
-
 			for(int i = 0; i < dim; i++){
 				nextFront->colors[row*dim + i] = front->right->colors[row*dim + i];
 				nextFront->right->colors[row*dim + i] = front->back->colors[row*dim + i];
 
-				/*nextFront->right->colors[row*dim + i] = front->back->colors[(dim - row)*dim - i - 1];*/
-				//nextFront->back->colors[(dim - row)*dim - i - 1] = front->left->colors[(dim - row)*dim - i - 1];
-				//nextFront->left->colors[(dim - row)*dim - i - 1] = tempFront->colors[row*dim + i];
-
 				nextFront->back->colors[row*dim + i] = front->left->colors[row*dim + i];
 				nextFront->left->colors[row*dim + i] = tempFront->colors[row*dim + i];
-
 
 				front->rotate[row*dim + i] = true;
 				front->left->rotate[row*dim + i] = true;
@@ -374,9 +378,9 @@ void rubiksCube::rotate(bool v, bool d) {
 
 			if(row == 0){
 				Side *tempTop = new Side(dim, vec4(0, 0, 0, 1));
-					for(int i = 0; i< dim*dim; i++){
-						tempTop->colors[i] = front->top->colors[i];
-					}
+				for(int i = 0; i< dim*dim; i++){
+					tempTop->colors[i] = front->top->colors[i];
+				}
 
 				for( int i = 0; i < dim; i++ ) {
 					for( int j = 0; j < dim; j++ ) {
@@ -385,11 +389,11 @@ void rubiksCube::rotate(bool v, bool d) {
 					}
 				}
 			}
-			else if(row == (dim - 1)){
+			if(row == (dim - 1)){
 				Side *tempTop = new Side(dim, vec4(0, 0, 0, 1));
-					for(int i = 0; i< dim*dim; i++){
-						tempTop->colors[i] = front->bottom->colors[i];
-					}
+				for(int i = 0; i< dim*dim; i++){
+					tempTop->colors[i] = front->bottom->colors[i];
+				}
 					
 				for( int i = 0; i < dim; i++ ) {
 					for( int j = 0; j < dim; j++ ) {
@@ -402,6 +406,7 @@ void rubiksCube::rotate(bool v, bool d) {
 	}
 }
 
+//Calls rotate on every row/column to acheive full cube rotation
 void rubiksCube::rotateCube( bool v, bool d ) {
 	if(anim->rotate){
 		return;
@@ -449,15 +454,12 @@ void rubiksCube::scramble() {
 		return;
 	}
 	
+	//Rotations based on current cursor rotation so save state and restore after
 	int tempCursor, vert, direction;
 	tempCursor = cursor;
 
-	//if((dim == 2) && (isScrambled == false)){
-	//	cursor = 0;
-	//}
-	//else{
-	//	cursor = random % dim*dim + 1;
-	//}
+	//Simluated randomization.  Didn't use srand() because it kept generating
+	//seg faults.  This essentially achieves same results.
 	cursor = random % (dim*dim);
 	vert = random/3 % 2;
 	direction = random % 2;
@@ -560,15 +562,18 @@ int rubiksCube::getCursor() {
 }
 
 void rubiksCube::update() {
+	//Update cursor
 	if( cursorHighlight >= 0.5 - inc || cursorHighlight <= 0.0 - inc) {
 		inc *= -1;
 	}
 	cursorHighlight += inc;
 
+	random = glutGet(GLUT_ELAPSED_TIME);
+
+	//Rest of method only relevant if rotating
 	if( !anim->rotate ) {
 		return;
 	}
-	random = glutGet(GLUT_ELAPSED_TIME);
 	if( anim->vert ) { //Vertical rotation
 		if( anim->dir ) { //Up
 			anim->transform = RotateX( (float)-90 / anim->numFrames ) * anim->transform;
